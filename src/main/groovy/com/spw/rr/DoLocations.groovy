@@ -1,12 +1,12 @@
 package com.spw.rr
 
-import groovy.xml.slurpersupport.GPathResult
+import org.w3c.dom.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class DoLocations {
     private static final Logger log = LoggerFactory.getLogger(DoLocations.class)
-    DoLocations(GPathResult current) {
+    DoLocations(Document current) {
         log.debug("processing the locations")
 
     }

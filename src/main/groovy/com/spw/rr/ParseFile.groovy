@@ -3,14 +3,14 @@ package com.spw.rr
 import groovy.transform.ToString
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import groovy.xml.XmlSlurper
-import groovy.xml.slurpersupport.GPathResult
+import groovy.xml.DOMBuilder
+import org.w3c.dom.Document
 
 @ToString(includePackage = false, includeNames = true)
 class ParseFile {
     private static final Logger log = LoggerFactory.getLogger(ParseFile.class)
 
-    def parsedText
+    Document parsedText
 
     public ParseFile(String fileLocation, String fileName) {
         log.debug("creating a ParseFile with ${fileLocation} and ${fileName}")
@@ -20,12 +20,12 @@ class ParseFile {
             log.error("Input file ${fileName} does not exist at location ${fileLoc}")
             System.exit(12)
         }
-        String inString = inputFile.text
-        parsedText = new XmlSlurper(false, true, true).parseText(inString)
+        BufferedReader rdr = new BufferedReader(new FileReader((inputFile)))
+        parsedText = DOMBuilder.parse(rdr, false, true, true)
         log.debug("processing xml to get locations ${parsedText}")
     }
 
-    GPathResult getParsed() {
+    Document getParsed() {
         log.debug("returning the parsed XML")
         return parsedText
     }
