@@ -10,9 +10,12 @@ class OpsReader {
 
     static void main(String[] args) {
         log.debug("starting to process the Ops Data")
-        GPathResult parsedLocation = new ParseFile(VarData.dataHome, VarData.locationsFile)
-        log.debug("result of parse was ${parsedLocation}")
-        log.error("Run complete")
+        ParseFile parsedLocation = new ParseFile(VarData.dataHome, VarData.locationsFile)
+        log.debug("result of parse was ${parsedLocation.getParsed()}")
+        DoLocations locs = new DoLocations(parsedLocation.getParsed())
+        ParseFile parsedCars = new ParseFile(VarData.dataHome, VarData.carFile)
+        DoCars cars = new DoCars(parsedCars.getParsed())
+        log.info("Run complete")
 
 
     }

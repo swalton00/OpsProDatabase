@@ -3,7 +3,7 @@
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-            <ThresholdFilter level="error" onMatch="ACCEPT" onMisMatch="DENY"/>
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMisMatch="DENY"/>
         </Console>
         <File name="file" fileName="opsReader.log" append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %p %m%n"/>
