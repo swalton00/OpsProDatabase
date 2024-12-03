@@ -11,24 +11,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 @Singleton
-class DatabaseProcess {
+class DatabaseProcess extends AbstractDatabase {
 
-    static DatabaseProcess db = null
     private static final Logger log = LoggerFactory.getLogger(DatabaseProcess.class)
-
-    SqlSessionFactory sqlSessionFactory = null
-    SqlSession session = null
-
-    void intialize(String url, String userid, String password) {
-        String resource = "mybatis-config.xml";
-        Properties props = new Properties()
-        props.put("url", url)
-        props.put("username", userid)
-        props.put("password", password)
-        InputStream inputStream = Resources.getResourceAsStream(resource);
-        sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream, props );
-        session = sqlSessionFactory.openSession(org.apache.ibatis.session.ExecutorType.REUSE, true)
-    }
 
     void setRunId(String runId, String runComment) {
         log.debug("setting runid to ${runId}")
@@ -68,8 +53,4 @@ class DatabaseProcess {
         log.debug("succesful completion of the setup for this runid/sequnce - ${runId}, ${seq.currentSeq}")
     }
 
-    void endRun() {
-        log.debug("ending the run -- closing the connection")
-        session.close()
-    }
 }

@@ -19,7 +19,7 @@ class OpsReader {
         DoCars cars = new DoCars(parsedCars.getParsed())
         db = DatabaseProcess.getInstance()
         try {
-            db.intialize(VarData.dbUrl, VarData.dbUserid, VarData.dbPw)
+            db.initialize("com/spw/mappers/MapperInterface.xml", VarData.dbUrl, VarData.dbUserid, VarData.dbPw)
             db.setRunId(VarData.runId, VarData.runComment)
         } catch (Exception e) {
             log.error("exception in processing", e)
