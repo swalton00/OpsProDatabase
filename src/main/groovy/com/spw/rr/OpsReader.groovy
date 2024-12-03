@@ -18,10 +18,14 @@ class OpsReader {
         ParseFile parsedCars = new ParseFile(VarData.dataHome, VarData.carFile)
         DoCars cars = new DoCars(parsedCars.getParsed())
         db = DatabaseProcess.getInstance()
-        db.intialize(VarData.dbUrl, VarData.dbUserid, VarData.dbPw)
+        try {
+            db.intialize(VarData.dbUrl, VarData.dbUserid, VarData.dbPw)
+            db.setRunId(VarData.runId, VarData.runComment)
+        } catch (Exception e) {
+            log.error("exception in processing", e)
+        } finally {
+            db.endRun()
+        }
         log.info("Run complete")
-
-
     }
-
 }

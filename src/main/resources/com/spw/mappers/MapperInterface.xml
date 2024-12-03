@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spw.mappers.MapperInterface">
+    <select id="selectRunId" resultType="RunId">
+        select
+            id,
+            runid,
+            comments as comment
+        from RunIds where runId = #{runid}
+    </select>
+    <update id="updateRunId" parameterType="RunId">
+        update runids set runid = #{runid},
+        comments = #{comment}
+    </update>
+    <insert id="insertRunId" useGeneratedKeys="true">
+        INSERT INTO runids
+            (
+                RunId,
+                comments,
+                Created_Date
+            )
+        VALUES
+            (
+                #{runid},
+                #{comment},
+                CURRENT_TIMESTAMP
+        )
+    </insert>
+    <insert id="insertSequence">
+        INSERT INTO seq_value
+            (
+                current_seq,
+                runid
+            )
+        VALUES
+        (
+            #{currentSeq},
+            #{runId}
+        );
+    </insert>
+    <update id="updateSequence">
+        UPDATE
+            seq_value
+        SET
+            current_seq = 1
+        WHERE
+            runid = #{runId};
+    </update>
+    <select id="getSequenceCount">
+        SELECT
+            COUNT(*)
+        FROM seq_value
+        WHERE
+            runId = #{runId}
+    </select>
+</mapper>

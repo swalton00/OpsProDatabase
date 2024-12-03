@@ -3,7 +3,15 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+    <settings>
+        <setting name="useGeneratedKeys" value="true"/>
+        <setting name="autoMappingUnknownColumnBehavior" value="FAILING"/>
+        <setting name="defaultExecutorType" value="REUSE"/>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
     <typeAliases>
+        <typeAlias type="com.spw.rr.Car" alias="Car"/>
+        <typeAlias type="com.spw.rr.Location" alias="Location"/>
         <package name="com.spw.mappers"/>
     </typeAliases>
     <environments default="development">
@@ -18,6 +26,6 @@
         </environment>
     </environments>
     <mappers>
-        <mapper resource="com/spw/mappers/mappers.xml"/>
+        <mapper resource="com/spw/mappers/MapperInterface.xml"/>
     </mappers>
 </configuration>
