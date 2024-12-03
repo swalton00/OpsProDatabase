@@ -8,7 +8,7 @@ class VarData {
     static String dataHome = 'C:/Users/jsw.SPW/JMRI/Ops.jmri/operations'
     static String carFile = 'OperationsCarRoster.xml'
     static String locationsFile = 'OperationsLocationRoster.xml'
-    static String dbUrl = 'jdbc:h2:C:/Projects/Ops_pro_Cars/Database/test;AUTO_SERVER=TRUE'
+    static String dbUrl = 'jdbc:h2:C:/Projects/Ops_pro_Cars/Database/test;AUTO_SERVER=TRUE;SET SCHEMA=parser'
     static String dbUserid = 'rr'
     static String dbPw = "rrpass"
 }
