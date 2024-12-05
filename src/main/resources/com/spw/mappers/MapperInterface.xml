@@ -44,7 +44,7 @@
         UPDATE
             seq_value
         SET
-            current_seq = 1
+            current_seq = #{currentSeq}
         WHERE
             runid = #{runId};
     </update>

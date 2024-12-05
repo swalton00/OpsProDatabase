@@ -13,9 +13,7 @@ class ProcessData {
         DatabaseProcess db = DatabaseProcess.getInstance()
         int currentSeq = db.getCurrentSequence()
         String currentRun = VarData.runId
-        Enumeration<Car> cars = carList.elements()
-        Car thisCar = cars.nextElement()
-        for (;cars.hasMoreElements();thisCar = cars.nextElement()) {
+        carList.values().forEach {thisCar ->
             thisCar.runId = currentRun
             db.mergeCar(thisCar)
             RunLoc runLoc = new RunLoc()
@@ -33,10 +31,7 @@ class ProcessData {
         String currentRun = VarData.runId
         DatabaseProcess db = DatabaseProcess.getInstance()
         int currentSeq = db.getCurrentSequence()
-        Enumeration<Location> locs = locList.elements()
-        Location thisLoc = locs.nextElement()
-        for(; locs.hasMoreElements(); thisLoc = locs.nextElement()) {
-
+        locList.values().forEach { thisLoc ->
             thisLoc.runId = currentRun
             db.mergeLocation(thisLoc)
         }
