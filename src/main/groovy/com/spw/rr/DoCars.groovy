@@ -25,10 +25,15 @@ class DoCars {
             thisCar.roadName = carXml.cars.car[i].'@roadName'.text()
             thisCar.carSecLocId = carXml.cars.car[i].'@secLocationId'.text()
             thisCar.carLoad = carXml.cars.car[i].'@load'.text()
-            carValues.put(thisCar.carId, thisCar)
-            log.debug("added car ${thisCar}")
+            if (thisCar.carLocId != null & !thisCar.carLocId.isEmpty()) {
+                carValues.put(thisCar.carId, thisCar)
+                log.debug("added car ${thisCar}")
+            } else [
+                    log.info(("skipping car ${thisCar.carId} because the location is empty"))
+            ]
         }
         log.debug("${carValues.size()} cars were added")
+        log.debug("cars hash is ${carValues}")
     }
 
     Hashtable<String, Car> getCarList() {

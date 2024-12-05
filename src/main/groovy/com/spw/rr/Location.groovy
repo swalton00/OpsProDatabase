@@ -9,4 +9,5 @@ class Location {
     String locName
     String trackType
     String locLength
+    String runId
 }

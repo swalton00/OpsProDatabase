@@ -21,6 +21,11 @@ class OpsReader {
         try {
             db.initialize("com/spw/mappers/MapperInterface.xml", VarData.dbUrl, VarData.dbUserid, VarData.dbPw)
             db.setRunId(VarData.runId, VarData.runComment)
+            Integer currentSequence = db.getCurrentSequence()
+            /* need to do locations first since runLocs will reference Locations */
+            ProcessData.doLocations(locs.getLocations())
+            ProcessData.doCars(cars.getCarList())
+
         } catch (Exception e) {
             log.error("exception in processing", e)
         } finally {

@@ -23,7 +23,7 @@ class DoLocations {
                 thisLoc.locId = current.locations.location[i].track[j].'@id'.text()
                 thisLoc.locLocId = current.locations.location[i].'@id'.text()
                 thisLoc.locName = current.locations.location[i].track[j].'@name'.text()
-                thisLoc.trackType = current.locations.location[i].track[j].'@locType'.text()
+                thisLoc.trackType = current.locations.location[i].track[j].'@trackType'.text()
                 thisLoc.locLength = current.locations.location[i].track[j].'@length'.text()
                 locValues.put(thisLoc.locId, thisLoc)
             }

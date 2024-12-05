@@ -48,11 +48,60 @@
         WHERE
             runid = #{runId};
     </update>
-    <select id="getSequenceCount">
+    <select id="getSequenceList">
         SELECT
-            COUNT(*)
+            id,
+            runId,
+            current_seq as currentSeq
         FROM seq_value
         WHERE
             runId = #{runId}
     </select>
+    <update id="mergeCar">
+        MERGE
+            INTO
+            cars ( carid, roadname, roadnumber, runid, carLoad )
+        KEY ( runId, CarId) VALUES
+        (
+        #{carId},
+        #{roadName},
+        #{roadNumber},
+        #{runId},
+        #{carLoad}
+        )
+    </update>
+    <insert id="insertRunLoc">
+        INSERT INTO run_locs
+            (
+                runId,
+                seq_num,
+                carId,
+                locId,
+                load
+            )
+
+        VALUES (
+                #{runId},
+                #{seqNum},
+                #{carId},
+                #{locId},
+                #{load}
+            )
+    </insert>
+    <update id="mergeLocation">
+        MERGE INTO locations
+            (
+                runId,
+                locId,
+                locName,
+                trackType,
+                locLength
+            ) KEY (runId, locId) VALUES (
+                #{runId},
+                #{locId},
+                #{locName},
+                #{trackType},
+                #{locLength}
+            )
+    </update>
 </mapper>
