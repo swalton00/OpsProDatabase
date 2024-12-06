@@ -36,5 +36,12 @@ test {
     useJUnitPlatform()
 }
 
+tasks.register("runWithUI", JavaExec) {
+    group = "application"
+    description = "Runs the Ops Reader with a Swing UI"
+    mainClass.set("com.spw.ui.OpsProgress")
+    classpath = sourceSets.main.runtimeClasspath
+}
+
 apply plugin: 'application'
 mainClassName = "com.spw.rr.OpsReader"
