@@ -1,0 +1,16 @@
+1. Add a Properties service
+    a. save properties file in user home location
+    b. with add, get and save methods
+2. Add an AbstractFrame class extending JFrame
+    a. add A Swing Listener for move and resize
+    b. when moved, save new location properties (under correct thread)
+    c. when resized, save new size
+3. Implement PropertiesListener in MainModel
+    a. validate values, enable buttons when all data present
+4. add buttons (menu items?) for views
+    a. display view
+    b. export csv of data
+    c. views of:
+        1) cars by locations
+        2) locations with cars
+        3) others?

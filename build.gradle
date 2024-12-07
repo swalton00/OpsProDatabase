@@ -29,6 +29,8 @@ dependencies {
     implementation group: 'com.h2database', name: 'h2', version: '1.4.200'
 // https://mvnrepository.com/artifact/org.mybatis/mybatis
     implementation group: 'org.mybatis', name: 'mybatis', version: '3.5.17'
+    // https://mvnrepository.com/artifact/com.miglayout/miglayout-swing
+    implementation group: 'com.miglayout', name: 'miglayout-swing', version: '11.4.2'
 
 }
 
