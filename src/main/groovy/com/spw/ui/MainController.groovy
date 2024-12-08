@@ -4,6 +4,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import javax.swing.SwingUtilities
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
 
 class MainController {
 
@@ -21,5 +23,26 @@ class MainController {
         })
     }
 
+    def buttonViewAction = { ActionEvent event ->
+        log.debug("got a reuest from the view button")
+
+    }
+
+    def buttonExitAction = { ActionEvent event ->
+        log.debug("received an exit Event")
+        SwingUtilities.invokeLater { System.exit(0)}
+
+    }
+
+    def buttonCollectAction = { ActionEvent event ->
+
+    }
+    def radioAction = { ActionEvent event ->
+
+    }
+
+    def selectHomeAction = { ActionEvent ->
+
+    }
 
 }
