@@ -5,13 +5,18 @@ import org.slf4j.LoggerFactory
 
 import javax.swing.SwingUtilities
 import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 
 class MainController {
 
     private static final Logger log = LoggerFactory.getLogger(MainController.class)
-    MainModel mm = new MainModel()
+    MainModel mm = new MainModel(this)
     MainView mv = null
+
+    boolean validFields() {
+        boolean fieldsValid = false
+
+        return fieldsValid
+    }
 
     public void start() {
         mv = new MainView(this, mm)
@@ -25,6 +30,10 @@ class MainController {
 
     def buttonViewAction = { ActionEvent event ->
         log.debug("got a reuest from the view button")
+
+    }
+
+    def buttonExportAction = { ActionEvent ->
 
     }
 

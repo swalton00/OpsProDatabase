@@ -4,6 +4,7 @@ import com.spw.mappers.MapperInterface
 import com.spw.mappers.RunId
 import com.spw.mappers.RunLoc
 import com.spw.mappers.SequenceValue
+import com.spw.utility.Message
 import org.apache.ibatis.session.SqlSession
 import org.apache.ibatis.session.SqlSessionFactory
 import org.apache.ibatis.session.SqlSessionFactoryBuilder
@@ -11,12 +12,43 @@ import org.apache.ibatis.io.Resources
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import java.sql.Connection
+
 @Singleton
 class DatabaseProcess extends AbstractDatabase {
 
     private static final Logger log = LoggerFactory.getLogger(DatabaseProcess.class)
 
     Integer currentSequence
+
+    /**
+     * Returns TRUE is the fields represent a valid database connection
+     * @param userid
+     * @param pw
+     * @param url
+     * @param schema
+     * @return true if the fields result in a valid database connection
+     */
+    boolean validateFields(String userid, String pw, String url, String schema, Message returnMessage) {
+        log.debug("now in the validator")
+        boolean returnValue = false // return false if there are any issues
+        Connection conn = null
+        log.debug("validating parameters ${userid}, ${url}, ${schema}")
+        try {
+            log.info("in the validator")
+            // for testing only
+            returnValue = true
+        } catch (Exception e) {
+            log.error("caught an exception validating fields", e)
+        } finally {
+            log.debug("closing the connection (if any)")
+            if (conn != null) {
+                conn.close()
+            }
+        }
+        log.debug("validator complete - return value is ${returnValue}")
+        return returnValue
+    }
 
     void setRunId(String runId, String runComment) {
         log.debug("setting runid to ${runId}")

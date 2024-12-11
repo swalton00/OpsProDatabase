@@ -6,7 +6,7 @@
             <ThresholdFilter level="info" onMatch="ACCEPT" onMisMatch="DENY"/>
         </Console>
         <File name="file" fileName="opsReader.log" append="false">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} %p %m%n"/>
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} {%t} %-tlevel %logger{36} %p %m%n"/>
         </File>
     </Appenders>
     <Loggers>
