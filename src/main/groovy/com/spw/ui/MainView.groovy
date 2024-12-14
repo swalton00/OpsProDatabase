@@ -1,6 +1,8 @@
 package com.spw.ui
 
 import com.spw.utility.Message
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import javax.swing.ButtonGroup
 import javax.swing.JFrame
@@ -20,6 +22,8 @@ import net.miginfocom.swing.MigLayout;
 class MainView {
     MainController mc
     MainModel mm
+
+    private static final Logger log = LoggerFactory.getLogger(MainView.class)
 
     MainView(MainController mc, MainModel mm) {
         this.mc = mc
@@ -57,27 +61,32 @@ class MainView {
         contentPanel.add(labelUserid, "right, cell 0 1")
         mm.userid.setToolTipText("Enter a user identifier - 1 to 8 characters, starting with a letter")
         mm.userid.setColumns(8)
+        mm.userid.setName("userid")
+        mm.userid.setColumns(8)
         contentPanel.add(mm.userid, "wrap")
         JLabel labelPassword = new JLabel("Password:")
         contentPanel.add(labelPassword, "right")
         mm.pw.setColumns(8)
+        mm.pw.setName("password")
         mm.pw.setToolTipText("Enter the password for this user (will create if this is a new database)")
-        mm.userid.setColumns(8)
         contentPanel.add(mm.pw, "wrap")
         JLabel labelSchema = new JLabel("Schema:")
         contentPanel.add(labelSchema, "right")
         mm.schema.setColumns(16)
+        mm.schema.setName("schema")
         mm.schema.setToolTipText("Enter the schema to use in the database (default 'parser')")
         contentPanel.add(mm.schema, "wrap")
         JLabel labelOpsHome = new JLabel("Operations Home")
         contentPanel.add(labelOpsHome, "right")
-        mm.opsHome.setColumns(20)
+        mm.opsHome.setColumns(40)
+        mm.opsHome.setName("opshome")
         mm.opsHome.setToolTipText("Enter the location of the Operations Home direcotory (or the use the button below)")
         contentPanel.add(mm.opsHome, "wrap")
         JLabel labelUrl = new JLabel("Database URL:")
         labelUrl.setHorizontalAlignment(SwingConstants.RIGHT)
         contentPanel.add(labelUrl, "right")
         mm.url.setColumns(40)
+        mm.url.setName("url")
         mm.url.setToolTipText("URL for the database in the form: 'jdbc:h2:file:<fullpath>")
         contentPanel.add(mm.url,"wrap")
         JLabel labelSave = new JLabel("Press the button to save the values:")
@@ -149,12 +158,12 @@ class MainView {
         finalPanel.add(mm.buttonOpsHome)
         mm.messagePanel = new JPanel(new MigLayout("", ",fill"))
         mm.messagePanel.setBackground(Color.WHITE)
-        mm.message.setUpdateRoutine {updateMessage}
+        mm.message.setUpdateRoutine(updateMessage)
         JLabel labelForMessage = new JLabel("Message:")
         mm.messagePanel.add(labelForMessage, "left")
-        mm.messageLabel = new JLabel("")
-        mm.messagePanel.setPreferredSize(new Dimension(75, 20))
-        mm.messagePanel.add(mm.messageLabel, "wrap")
+        mm.messagePanel.setPreferredSize(new Dimension(400, 20))
+        mm.message.messageLabel.setColumns(300)
+        mm.messagePanel.add(mm.message.messageLabel, "grow 100, wrap")
         base.getContentPane().add(finalPanel, "center, span 2, wrap")
         base.getContentPane().add(mm.messagePanel,"span 2, wrap")
 
@@ -173,10 +182,30 @@ class MainView {
     }
 
     private void edtUpdate(Message theMessage) {
-
+        log.debug("entered the edt update routine - message was ${theMessage}")
+        String oldMessage = mm.message.messageLabel.getText()
+        log.debug("message old is ${oldMessage} and new message is ${theMessage.text}")
+        mm.message.messageLabel.setText(theMessage.text)
+        switch (theMessage.msgLevel) {
+            case Message.Level.ERROR :
+                mm.message.messageLabel.setBackground(Color.RED)
+                mm.message.messageLabel.setForeground(Color.WHITE)
+                break
+            case Message.Level.WARNING :
+                mm.message.messageLabel.setBackground(Color.YELLOW)
+                mm.message.messageLabel.setForeground(Color.BLACK)
+                break
+            case Message.Level.INFO :
+                mm.message.messageLabel.setBackground(Color.WHITE)
+                mm.message.messageLabel.setForeground(Color.BLACK)
+                break
+                default :
+                log.error("msgLevel was an unknown value ${theMessage.msgLevel}")
+        }
     }
 
-    void updateMessage(Message mess) {
+    def updateMessage = { Message mess ->
+        log.debug("updating message with new message ${mess.text}")
         if (SwingUtilities.isEventDispatchThread()) {
             edtUpdate(mess )
         } else {

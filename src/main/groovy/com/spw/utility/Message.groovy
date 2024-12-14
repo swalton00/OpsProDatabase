@@ -6,8 +6,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import javax.swing.JLabel
+import javax.swing.JTextField
 
-@ToString(includeFields = true, includePackage = false, includeNames = true)
+@ToString(includePackage = false, includeNames = true, includes = ["text", "msgLevel"])
 class Message {
 
     private static final Logger log = LoggerFactory.getLogger(Message.class)
@@ -17,8 +18,8 @@ class Message {
         INFO, WARNING, ERROR
     }
 
-
-    JLabel messageLable = new JLabel()
+    String text = ""
+    JTextField messageLabel = new JTextField("xxxxxyyyyyyyy")
     Level msgLevel
 
     Message() {
@@ -36,7 +37,11 @@ class Message {
     }
 
     void setText(String text, Level msgLevel) {
-
+        this.text = text
+        this.msgLevel = msgLevel
+        if (updateRoutine != null) {
+            updateRoutine(this)
+        }
 
     }
 }

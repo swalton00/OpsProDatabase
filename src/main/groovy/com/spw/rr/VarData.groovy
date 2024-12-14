@@ -11,6 +11,6 @@ class VarData {
     static String dbUrl = 'jdbc:h2:C:/Projects/Ops_pro_Cars/Database/test;AUTO_SERVER=TRUE;SCHEMA=parser'
     static String dbUserid = 'rr'
     static String dbPw = "rrpass"
-    static String runId = "A"
+    static String runId = "B"
     static String runComment = "First test of the program"
 }

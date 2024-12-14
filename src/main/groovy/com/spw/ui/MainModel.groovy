@@ -35,6 +35,7 @@ class MainModel implements FocusListener {
         pw.addFocusListener(this)
         url.addFocusListener(this)
         schema.addFocusListener(this)
+        opsHome.addFocusListener(this)
         db = DatabaseProcess.getInstance()
     }
 
@@ -43,8 +44,11 @@ class MainModel implements FocusListener {
         setup()
     }
 
+    String homeValue
+
     boolean readyToCheck = false
     boolean fieldsValid = false
+    boolean  homeValid = false
     boolean dbConnected = false
     boolean runReady = false
     boolean viewReady = false
@@ -74,10 +78,52 @@ class MainModel implements FocusListener {
         return
     }
 
+    Runnable checkOpsHome = () -> {
+        boolean resultValue = false
+        log.debug("checking ops home value of ${homeValue}")
+        try {
+            File homeLocation = new File(homeValue)
+            if (!homeLocation.exists()) {
+                message.setText("New Ops Home location does not exist", Message.Level.ERROR)
+                return
+            }
+            if (!homeLocation.isDirectory()) {
+                message.setText("New Ops Home Location must be a directory", Message.Level.ERROR)
+                return
+            }
+            File carRoster = new File(homeLocation, "OperationsCarRoster.xml")
+            if (!(carRoster.exists() & carRoster.canRead())) {
+                message.setText("Car Roster not found in Ops Home location:", Message.Level.ERROR)
+                return
+            }
+            File locationRoster = new File(homeLocation, "OperationsLocationRoster.xml")
+            if (!(locationRoster.exists() & locationRoster.canRead())) {
+                message.setText("Location xml file not found in Ops Home location", Message.Level.ERROR)
+                return
+            }
+            message.setText("      ", Message.Level.INFO)
+        } catch (Exception e) {
+            if (e.getClass() == FileNotFoundException.class) {
+                message.setText("Ops Home file not found exception", Message.Level.ERROR)
+                return
+            } else {
+                log.error("Exception validating Ops Home - value was ${homeValue}", e)
+                message("Exception attempting to validate the new Ops Home setting")
+            }
+        }
+        homeValid = resultValue
+        log.debug("result was validation was ${homeValid}")
+    }
+
     @Override
     void focusLost(FocusEvent e) {
         log.debug("focus lost")
         if (!readyToCheck) return
+        if ("opshome".equals(e.getSource().getName()) ) {
+            log.debug("validing new Ops Home location")
+            homeValue = opsHome.getText()
+            taskRunner.runIt(checkOpsHome)
+        }
         if (!fieldsValid) {
             log.debug("not fieldsValid is true")
             if (!(userid.getText().isBlank()
