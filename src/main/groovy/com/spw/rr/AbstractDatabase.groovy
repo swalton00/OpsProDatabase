@@ -16,6 +16,7 @@ abstract class AbstractDatabase {
 
 
     void initialize(String mapper, String url, String userid, String password) {
+        log.debug("AbstractDatabase initializing")
         String resource = "mybatis-config.xml";
         Properties props = new Properties()
         props.put("url", url)

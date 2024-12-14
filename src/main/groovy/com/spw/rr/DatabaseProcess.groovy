@@ -4,22 +4,43 @@ import com.spw.mappers.MapperInterface
 import com.spw.mappers.RunId
 import com.spw.mappers.RunLoc
 import com.spw.mappers.SequenceValue
+import com.spw.utility.ApplyResources
 import com.spw.utility.Message
 import org.apache.ibatis.session.SqlSession
 import org.apache.ibatis.session.SqlSessionFactory
 import org.apache.ibatis.session.SqlSessionFactoryBuilder
 import org.apache.ibatis.io.Resources
+import org.h2.Driver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import javax.swing.plaf.nimbus.State
 import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.PreparedStatement
+import java.sql.ResultSet
+import java.sql.Statement
+import java.util.regex.Pattern
 
 @Singleton
 class DatabaseProcess extends AbstractDatabase {
 
     private static final Logger log = LoggerFactory.getLogger(DatabaseProcess.class)
+    private static final String SCHEMA_TEST = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?"
+    private static final String TABLE_TEST = "SELECT COUNT(*) from information_schema.TABLES where table_schema = ?"
+    private static final String CREATE_SCHEMA = "CREATE SCHEMA "
+    private static final String SET_SCHEMA = "SET SCHEMA = "
+    private static final String RESOURCE_NAME = "table_create.sql"
 
     Integer currentSequence
+
+    private boolean createTables(Connection conn, String schema) {
+        log.debug("creating the tables")
+        Statement stmt = conn.createStatement()
+        stmt.execute(SET_SCHEMA + schema.toString())
+        ApplyResources resources = new ApplyResources()
+        return resources.excuteSQLResource(conn, RESOURCE_NAME)
+    }
 
     /**
      * Returns TRUE is the fields represent a valid database connection
@@ -35,11 +56,68 @@ class DatabaseProcess extends AbstractDatabase {
         Connection conn = null
         log.debug("validating parameters ${userid}, ${url}, ${schema}")
         try {
-            log.info("in the validator")
-            // for testing only
-            returnValue = true
+            log.trace("in the validator - checking URL - ${url}")
+            log.trace("validating schema - ${schema}")
+            if (!Pattern.matches("[a-zA-Z][0-9a-zA-Z]*", schema)) {
+                log.trace("schema doesn't match pattern")
+                returnMessage.setText("Schema must start with a letter and contain only letters and numbers", Message.Level.ERROR)
+                return false
+            }
+            if (!url.startsWith("jdbc:")) {
+                log.trace("url wrong format - doesn't start with 'jdbc:'")
+                returnMessage.setText("Incorrect URL format - should start with 'jdbc:'", Message.Level.ERROR)
+                return false
+            }
+            if (!url.startsWith("jdbc:h2:")) {
+                log.trace("possible incorrect database - only H2 supported - URL should start with 'jdbc:h2:'")
+                returnMessage.setText("Possible incorrect database - only H2 supported 'jdbc:h2:....'", Message.Level.ERROR)
+                return false
+            }
+            if (url.contains(";SCHEMA=")) {
+                log.trace("URL contains schema")
+                returnMessage.setText("URL should not contain the schema (will be set internally)", Message.Level.ERROR)
+                return false
+            }
+            log.debug("testing the database connection")
+            conn = DriverManager.getConnection(url, userid, pw)
+            if (conn != null) {
+                log.trace("got a good connection with that URL, userid and password")
+                PreparedStatement schemaStatement = conn.prepareStatement(SCHEMA_TEST)
+                schemaStatement.setString(1, schema.toUpperCase())
+                ResultSet schemaResult = schemaStatement.executeQuery()
+                if (!schemaResult.next()) {
+                    log.error("Should have returned a count of number of matching schemas - 0 or 1, got no result set")
+                } else {
+                    int matchCount = schemaResult.getInt(1)
+                    if (matchCount == 0) {
+                        log.trace("no matching schema - creating")
+                        PreparedStatement stmt = conn.prepareStatement(CREATE_SCHEMA + schema.toString())
+                        stmt.execute()
+                    } else if (matchCount == 1) {
+                        log.trace("schema already present - checking for tables")
+                        PreparedStatement stmt = conn.prepareStatement(TABLE_TEST)
+                        stmt.setString(1, schema)
+                        ResultSet rs = stmt.executeQuery()
+                        if (!rs.next()) {
+                            log.error("no result set returned on getting table count")
+                            throw new RuntimeException("no result set from select count(*) for table count")
+                        }
+                        int tableCount = rs.getInt(1)  // get count of tables in this schema
+                        if (tableCount == 0) {
+                            returnValue = createTables(conn, schema)
+                        } else if (tableCount != 5) {
+                            log.error("got an incorrect table count - value was ${tableCount}")
+                            throw new RuntimeException("Incorrect table count in schema ${schema} - count is ${tableCount}")
+                        } else {
+                            log.debug("all looks good - validated!")
+                            returnValue = true
+                        }
+                    }
+                }
+            }
         } catch (Exception e) {
             log.error("caught an exception validating fields", e)
+            returnMessage.setText("Error validating fields", Message.Level.ERROR)
         } finally {
             log.debug("closing the connection (if any)")
             if (conn != null) {

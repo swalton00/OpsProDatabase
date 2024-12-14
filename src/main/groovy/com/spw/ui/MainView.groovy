@@ -161,9 +161,9 @@ class MainView {
         mm.message.setUpdateRoutine(updateMessage)
         JLabel labelForMessage = new JLabel("Message:")
         mm.messagePanel.add(labelForMessage, "left")
-        mm.messagePanel.setPreferredSize(new Dimension(400, 20))
-        mm.message.messageLabel.setColumns(300)
-        mm.messagePanel.add(mm.message.messageLabel, "grow 100, wrap")
+        mm.messagePanel.setPreferredSize(new Dimension(600, 20))
+        mm.message.messageLabel.setColumns(400)
+        mm.messagePanel.add(mm.message.messageLabel, "grow 200, wrap")
         base.getContentPane().add(finalPanel, "center, span 2, wrap")
         base.getContentPane().add(mm.messagePanel,"span 2, wrap")
 

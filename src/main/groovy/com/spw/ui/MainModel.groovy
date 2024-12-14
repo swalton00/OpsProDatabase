@@ -122,7 +122,9 @@ class MainModel implements FocusListener {
         if ("opshome".equals(e.getSource().getName()) ) {
             log.debug("validing new Ops Home location")
             homeValue = opsHome.getText()
-            taskRunner.runIt(checkOpsHome)
+            if (!homeValue.isBlank()) {
+                taskRunner.runIt(checkOpsHome)
+            }
         }
         if (!fieldsValid) {
             log.debug("not fieldsValid is true")
