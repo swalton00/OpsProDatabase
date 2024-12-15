@@ -1,0 +1,27 @@
+= Ops Car Progress
+J. Scott Walton
+:description: documentation for the Ops Car program
+
+== Introduction
+
+The Ops Car Progress program is a tool to record (in a database)
+by running it at intervals as trains are moved by the JMRI OpsPro
+program. The Ops Car Progress program (hereafter referred to as
+OpsCar) reads the JMRI OpsPro files and read them in the database.
+The next time the programd is run, it will record the location of
+cars at that point. You can then look at the position of each car
+at each of the two points. Or, you can look at which cars at
+each location. Each execution of the OpCar program will create
+another set of records of cars and locations. Ideally, you would
+run the OpsCar program each tie you terminate a train in JMRI OpsPro.
+That would give you a way to track the movement of cars to ensure
+that the cars are moving the way you want them.
+
+== Installation
+
+
+
+
+
+
+
