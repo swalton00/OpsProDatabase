@@ -19,7 +19,7 @@ class Message {
     }
 
     String text = ""
-    JTextField messageLabel = new JTextField("xxxxxyyyyyyyy")
+    JTextField messageLabel = new JTextField(" ")
     Level msgLevel
 
     Message() {

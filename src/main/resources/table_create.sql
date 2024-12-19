@@ -7,7 +7,7 @@ CREATE TABLE
         trackType VARCHAR(32),
         locLength VARCHAR(32),
         runId      VARCHAR(16),
-        Unique  (runId, runId, locId)
+        Unique  (runId, locId)
     );
 CREATE TABLE
     IF NOT EXISTS cars

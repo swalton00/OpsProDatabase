@@ -1,6 +1,7 @@
 package com.spw.ui
 
 import com.spw.rr.OpsReader
+import com.spw.utility.PropertySaver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -20,6 +21,7 @@ class OpsProgress {
 
     static void main(String[] args) {
         log.trace("starting the application")
+        PropertySaver.getInstance().init()
         MainController mc = new MainController()
         mc.start()
     }

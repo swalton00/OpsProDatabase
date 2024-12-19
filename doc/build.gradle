@@ -52,7 +52,7 @@ asciidoctorPdf {
                 'sourcedir': file('src/docs/asciidoc')
 
         sources {
-            include 'main.adoc'
+            include 'OpsDoc.adoc'
         }
     }
 
@@ -68,6 +68,6 @@ asciidoctor {
     }
 
     sources {
-        include 'main.adoc'
+        include 'OpsDoc.adoc'
     }
 }

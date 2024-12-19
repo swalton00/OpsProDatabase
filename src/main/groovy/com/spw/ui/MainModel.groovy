@@ -2,6 +2,7 @@ package com.spw.ui
 
 import com.spw.rr.DatabaseProcess
 import com.spw.utility.Message
+import com.spw.utility.PropertySaver
 import com.spw.utility.RunTasks
 import groovy.transform.ToString
 import org.slf4j.Logger
@@ -17,27 +18,16 @@ import javax.swing.SwingUtilities
 import java.awt.event.ActionEvent
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
+import java.util.regex.Pattern
 
 @ToString(includeNames = true, includePackage = false, includeFields = true)
 class MainModel implements FocusListener {
 
     private MainController mc = null
     private static final Logger log = LoggerFactory.getLogger(MainModel.class)
-    DatabaseProcess db = DatabaseProcess.getInstance()
+    private static final DatabaseProcess db = DatabaseProcess.getInstance()
+    private static final PropertySaver saver = PropertySaver.getInstance()
     RunTasks taskRunner = RunTasks.getInstance()
-
-
-    public MainModel() {
-    }
-
-    void setup() {
-        userid.addFocusListener(this)
-        pw.addFocusListener(this)
-        url.addFocusListener(this)
-        schema.addFocusListener(this)
-        opsHome.addFocusListener(this)
-        db = DatabaseProcess.getInstance()
-    }
 
     public MainModel(MainController mc) {
         this.mc = mc
@@ -48,10 +38,17 @@ class MainModel implements FocusListener {
 
     boolean readyToCheck = false
     boolean fieldsValid = false
-    boolean  homeValid = false
+    boolean homeValid = false
     boolean dbConnected = false
     boolean runReady = false
     boolean viewReady = false
+
+    boolean validHome = false
+    boolean validUserid = false
+    boolean validPassword = false
+    boolean validSchema = false
+    boolean validURL = false
+    boolean validRunid = false
 
     JTextField userid = new JTextField("")
     JPasswordField pw = new JPasswordField("")
@@ -73,14 +70,118 @@ class MainModel implements FocusListener {
     JPanel messagePanel
     JLabel messageLabel
 
+    String priorValue
+
+
+    public MainModel() {
+    }
+
+    void checkFields() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            innerCheckFields()
+        } else {
+            SwingUtilities.invokeLater { ->
+                innerCheckFields()
+            }
+        }
+    }
+
+    private void innerCheckFields() {
+        boolean foundError = false
+        String msgText = ""
+        if (userid.getText().isBlank()) {
+            validUserid = false
+        } else {
+            validUserid = true
+        }
+        if (new String(pw.getPassword()).isBlank()) {
+            validPassword = false
+        } else {
+            validPassword = true
+        }
+        if (url.getText().isBlank()) {
+            validURL = false
+        } else {
+            if (url.getText().startsWith("jdbc:h2:")) {
+                if (url.getText().contains(";SCHEMA=")) {
+                    log.trace("URL contains schema")
+                    foundError = true
+                    msgText = "URL should not contain the schema (will be set internally)"
+                } else {
+                    validURL = true
+                }
+            } else if (url.getText().startsWith("jdbc:")) {
+                log.trace("possible incorrect database - only H2 supported - URL should start with 'jdbc:h2:'")
+                foundError = true
+                msgText = "Possible incorrect database - only H2 supported 'jdbc:h2:....'"
+            } else {
+                log.trace("url wrong format - doesn't start with 'jdbc:'")
+                foundError = true
+                msgText = "Incorrect URL format - should start with 'jdbc:'"
+            }
+        }
+        if (schema.getText().isBlank()) {
+            validSchema = false
+        } else {
+            validSchema = true
+        }
+        if (foundError) {
+            message.setText(msgText, Message.Level.ERROR)
+        } else {
+            if (validHome &
+            validSchema &
+            validURL &
+            validPassword &
+            validUserid) {
+                message.setText("")
+                fieldsValid = true
+                saveValues.setEnabled(true)
+            }
+        }
+        if (!validHome & !opsHome.getText().isBlank()) {
+            homeValue = opsHome.getText()
+            taskRunner.runIt(checkOpsHome)
+        }
+
+    }
+
+    String checkNotNull(String key) {
+        String temp = saver.getBaseString(key)
+        if (temp == null) {
+            log.debug("setting ${key} to empty string")
+            temp = ""
+        }
+        return temp
+    }
+
+    void setup() {
+        userid.setText(checkNotNull("userid"))
+        pw.setText(checkNotNull("password"))
+        url.setText(checkNotNull("url"))
+        schema.setText(checkNotNull("schema"))
+        opsHome.setText(checkNotNull("opsHome"))
+        userid.addFocusListener(this)
+        pw.addFocusListener(this)
+        url.addFocusListener(this)
+        schema.addFocusListener(this)
+        opsHome.addFocusListener(this)
+        runId.addFocusListener(this)
+        checkFields()
+    }
+
     @Override
     void focusGained(FocusEvent e) {
+        if (e.getComponent().class == JTextField.class) {
+            priorValue = e.getComponent().getText()
+        } else if (e.getComponent().getClass() == JPasswordField) {
+            priorValue = new String(e.getComponent().getPassword())
+        }
         return
     }
 
     Runnable checkOpsHome = () -> {
-        boolean resultValue = false
         log.debug("checking ops home value of ${homeValue}")
+        boolean resultValue = false
         try {
             File homeLocation = new File(homeValue)
             if (!homeLocation.exists()) {
@@ -102,6 +203,9 @@ class MainModel implements FocusListener {
                 return
             }
             message.setText("      ", Message.Level.INFO)
+            validHome = true
+            resultValue = true
+            log.trace("Ops Home now valid")
         } catch (Exception e) {
             if (e.getClass() == FileNotFoundException.class) {
                 message.setText("Ops Home file not found exception", Message.Level.ERROR)
@@ -112,54 +216,19 @@ class MainModel implements FocusListener {
             }
         }
         homeValid = resultValue
+        if (homeValid) {
+            validHome = true
+            checkFields()
+        }
         log.debug("result was validation was ${homeValid}")
+
     }
 
     @Override
     void focusLost(FocusEvent e) {
         log.debug("focus lost")
         if (!readyToCheck) return
-        if ("opshome".equals(e.getSource().getName()) ) {
-            log.debug("validing new Ops Home location")
-            homeValue = opsHome.getText()
-            if (!homeValue.isBlank()) {
-                taskRunner.runIt(checkOpsHome)
-            }
-        }
-        if (!fieldsValid) {
-            log.debug("not fieldsValid is true")
-            if (!(userid.getText().isBlank()
-                    | (pw.getPassword().length == 0)
-                    | url.getText().isBlank()
-                    | schema.getText().isBlank()
-                    | opsHome.getText().isBlank())) {
-                log.debug("creating the task")
-                Runnable validatorTask = () -> {
-                    log.debug("first line of the validator task")
-                    if (SwingUtilities.isEventDispatchThread()) {
-                        log.debug("still running under the EDT - returning")
-                        return
-                    }
-                    boolean returned = db.validateFields(userid.getText(),
-                            new String(pw.getPassword()),
-                            url.getText(),
-                            schema.getText(),
-                            message)
-                    SwingUtilities.invokeLater {
-                        log.debug("invoked later ")
-                        fieldsValid = returned
-                        if (fieldsValid) {
-                            saveValues.setEnabled(true)
-                        }
-                    }
-                }
-                log.debug("about to submit")
-                taskRunner.runIt(validatorTask)
-            }
-        } else {
-            log.debug("focus lost but fielsValid is already true")
-
-        }
+        innerCheckFields()
     }
 }
 

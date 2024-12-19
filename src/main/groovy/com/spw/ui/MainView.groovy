@@ -1,15 +1,14 @@
 package com.spw.ui
 
 import com.spw.utility.Message
+import com.spw.utility.OpFrame
+import com.spw.utility.PropertySaver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import javax.swing.ButtonGroup
-import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JSeparator
-import javax.swing.JTextField
 import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
@@ -24,6 +23,7 @@ class MainView {
     MainModel mm
 
     private static final Logger log = LoggerFactory.getLogger(MainView.class)
+    private static final PropertySaver saver = PropertySaver.getInstance()
 
     MainView(MainController mc, MainModel mm) {
         this.mc = mc
@@ -41,12 +41,23 @@ class MainView {
     }
 
     public void start() {
-        JFrame base = new JFrame()
+        OpFrame base = new OpFrame()
         base.getContentPane().setLayout(new MigLayout())
         base.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
         base.setTitle("Ops Progress Main")
+        Integer frameWidth = saver.getInt("main", base.getWidthName())
+        if (frameWidth == null) {
+            frameWidth = 250
+            saver.saveInt("main", base.getWidthName(), 250)
+        }
+        Integer frameHeight = saver.getInt("main", base.getHeightName())
+        if (frameHeight == null) {
+            frameHeight = 400
+            saver.saveInt("main", base.getHeightName(), 400)
+        }
         base.setSize(250, 400)
         base.getContentPane().setSize(250, 400)
+        base.setName("main")
         JLabel appTitle = new JLabel("Ops Progress")
         makeLarger(appTitle, 36)
         JPanel titlePanel = new JPanel(new MigLayout("center"))
@@ -88,11 +99,12 @@ class MainView {
         mm.url.setColumns(40)
         mm.url.setName("url")
         mm.url.setToolTipText("URL for the database in the form: 'jdbc:h2:file:<fullpath>")
-        contentPanel.add(mm.url,"wrap")
+        contentPanel.add(mm.url, "wrap")
         JLabel labelSave = new JLabel("Press the button to save the values:")
         contentPanel.add(labelSave, "right")
         mm.saveValues.setToolTipText("Press this button to save the values and open the database")
         mm.saveValues.setEnabled(false)
+        mm.saveValues.addActionListener(mc.buttonSaveValuesAction)
         contentPanel.add(mm.saveValues, "left, wrap")
 
         JSeparator sep1 = new JSeparator()
@@ -104,12 +116,13 @@ class MainView {
         JLabel labelRunId = new JLabel("Run Identiefier")
         contentPanel.add(labelRunId, "right")
         mm.runId.setColumns(8)
+        mm.runId.setName("runid")
         mm.runId.setToolTipText("Enter a label to identify this set of runs")
-        mm.runId.setEnabled(false)
         contentPanel.add(mm.runId, "wrap")
         JLabel labelRunComment = new JLabel("Run comment")
         contentPanel.add(labelRunComment, "right")
         mm.runComment.setColumns(20)
+        mm.runComment.setName("runcomment")
         mm.runComment.setToolTipText("Enter a comment about the set of runs")
         contentPanel.add(mm.runComment, "wrap")
         JLabel labelSequence = new JLabel("Sequence")
@@ -165,18 +178,24 @@ class MainView {
         mm.message.messageLabel.setColumns(400)
         mm.messagePanel.add(mm.message.messageLabel, "grow 200, wrap")
         base.getContentPane().add(finalPanel, "center, span 2, wrap")
-        base.getContentPane().add(mm.messagePanel,"span 2, wrap")
+        base.getContentPane().add(mm.messagePanel, "span 2, wrap")
 
         // now ready to display
         base.pack()
-        int frameWidth = base.getWidth()
-        int frameHeight = base.getHeight()
+        frameWidth = base.getWidth()
+        frameHeight = base.getHeight()
         Toolkit toolkit = Toolkit.getDefaultToolkit()
         int screenWidth = toolkit.getScreenSize().width
         int screenHeight = toolkit.getScreenSize().height
-        int x = (screenWidth - frameWidth)/2
-        int y = (screenHeight - frameHeight)/2
-        base.setLocation(x, y)
+        Integer frameLocX = saver.getInt("main", base.getXname())
+        Integer frameLocY = saver.getInt("main", base.getYname())
+        if (frameLocX == null) {
+            frameLocX = (screenWidth - frameWidth) / 2
+            frameLocY = (screenHeight - frameHeight) / 2
+            saver.saveInt("main", base.getXname(), frameLocX)
+            saver.saveInt("main", base.getYname(), frameLocY)
+        }
+        base.setLocation(frameLocX, frameLocY)
         mm.readyToCheck = true
         base.setVisible(true)
     }
@@ -187,19 +206,19 @@ class MainView {
         log.debug("message old is ${oldMessage} and new message is ${theMessage.text}")
         mm.message.messageLabel.setText(theMessage.text)
         switch (theMessage.msgLevel) {
-            case Message.Level.ERROR :
+            case Message.Level.ERROR:
                 mm.message.messageLabel.setBackground(Color.RED)
                 mm.message.messageLabel.setForeground(Color.WHITE)
                 break
-            case Message.Level.WARNING :
+            case Message.Level.WARNING:
                 mm.message.messageLabel.setBackground(Color.YELLOW)
                 mm.message.messageLabel.setForeground(Color.BLACK)
                 break
-            case Message.Level.INFO :
+            case Message.Level.INFO:
                 mm.message.messageLabel.setBackground(Color.WHITE)
                 mm.message.messageLabel.setForeground(Color.BLACK)
                 break
-                default :
+            default:
                 log.error("msgLevel was an unknown value ${theMessage.msgLevel}")
         }
     }
@@ -207,7 +226,7 @@ class MainView {
     def updateMessage = { Message mess ->
         log.debug("updating message with new message ${mess.text}")
         if (SwingUtilities.isEventDispatchThread()) {
-            edtUpdate(mess )
+            edtUpdate(mess)
         } else {
             SwingUtilities.invokeLater {
                 edtUpdate(mess)

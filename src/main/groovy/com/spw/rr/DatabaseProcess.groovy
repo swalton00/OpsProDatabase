@@ -42,6 +42,30 @@ class DatabaseProcess extends AbstractDatabase {
         return resources.excuteSQLResource(conn, RESOURCE_NAME)
     }
 
+    public void testRoutine(String testValue) {
+        log.debug("in the test routine with value ${testValue}")
+    }
+
+    String userid
+    String pw
+    String schema
+    String url
+    Message mess
+
+
+    void test3() {
+        log.debug("in test3")
+        boolean retVal
+        retVal = testRet(mess)
+    }
+
+
+    boolean testRet(Message newMess) {
+        log.debug("in the TestRet")
+        boolean retVal = vl(userid, pw, schema, url, newMess)
+        log.debug("vl returned ${retVal}")
+    }
+
     /**
      * Returns TRUE is the fields represent a valid database connection
      * @param userid
@@ -50,34 +74,12 @@ class DatabaseProcess extends AbstractDatabase {
      * @param schema
      * @return true if the fields result in a valid database connection
      */
-    boolean validateFields(String userid, String pw, String url, String schema, Message returnMessage) {
+    boolean validateFieslds(String userid, String pw, String url, String schema, Message returnMessage) {
         log.debug("now in the validator")
         boolean returnValue = false // return false if there are any issues
         Connection conn = null
         log.debug("validating parameters ${userid}, ${url}, ${schema}")
         try {
-            log.trace("in the validator - checking URL - ${url}")
-            log.trace("validating schema - ${schema}")
-            if (!Pattern.matches("[a-zA-Z][0-9a-zA-Z]*", schema)) {
-                log.trace("schema doesn't match pattern")
-                returnMessage.setText("Schema must start with a letter and contain only letters and numbers", Message.Level.ERROR)
-                return false
-            }
-            if (!url.startsWith("jdbc:")) {
-                log.trace("url wrong format - doesn't start with 'jdbc:'")
-                returnMessage.setText("Incorrect URL format - should start with 'jdbc:'", Message.Level.ERROR)
-                return false
-            }
-            if (!url.startsWith("jdbc:h2:")) {
-                log.trace("possible incorrect database - only H2 supported - URL should start with 'jdbc:h2:'")
-                returnMessage.setText("Possible incorrect database - only H2 supported 'jdbc:h2:....'", Message.Level.ERROR)
-                return false
-            }
-            if (url.contains(";SCHEMA=")) {
-                log.trace("URL contains schema")
-                returnMessage.setText("URL should not contain the schema (will be set internally)", Message.Level.ERROR)
-                return false
-            }
             log.debug("testing the database connection")
             conn = DriverManager.getConnection(url, userid, pw)
             if (conn != null) {
@@ -89,6 +91,7 @@ class DatabaseProcess extends AbstractDatabase {
                     log.error("Should have returned a count of number of matching schemas - 0 or 1, got no result set")
                 } else {
                     int matchCount = schemaResult.getInt(1)
+                    int tableCount = 0
                     if (matchCount == 0) {
                         log.trace("no matching schema - creating")
                         PreparedStatement stmt = conn.prepareStatement(CREATE_SCHEMA + schema.toString())
@@ -102,17 +105,19 @@ class DatabaseProcess extends AbstractDatabase {
                             log.error("no result set returned on getting table count")
                             throw new RuntimeException("no result set from select count(*) for table count")
                         }
-                        int tableCount = rs.getInt(1)  // get count of tables in this schema
-                        if (tableCount == 0) {
-                            returnValue = createTables(conn, schema)
-                        } else if (tableCount != 5) {
-                            log.error("got an incorrect table count - value was ${tableCount}")
-                            throw new RuntimeException("Incorrect table count in schema ${schema} - count is ${tableCount}")
-                        } else {
-                            log.debug("all looks good - validated!")
-                            returnValue = true
-                        }
+                        tableCount = rs.getInt(1)  // get count of tables in this schema
                     }
+                    if (tableCount == 0) {
+                        returnValue = createTables(conn, schema)
+                        log.debug("create tables returned ${returnValue}")
+                    } else if (tableCount != 5) {
+                        log.error("got an incorrect table count - value was ${tableCount}")
+                        throw new RuntimeException("Incorrect table count in schema ${schema} - count is ${tableCount}")
+                    } else {
+                        log.debug("all looks good - validated!")
+                        returnValue = true
+                    }
+
                 }
             }
         } catch (Exception e) {
@@ -151,7 +156,6 @@ class DatabaseProcess extends AbstractDatabase {
             log.debug("SequenceValue is now ${seq} and count is ${insertCount}")
 
         } else if (runIdList.size() == 1) {
-            map.updateRunId(newRunId)
             List<SequenceValue> seqList = map.getSequenceList(newRunId.runid)
             log.debug("got a sequence list of size ${seqList.size()}")
             if (seqList.size() == 0) {
@@ -166,8 +170,7 @@ class DatabaseProcess extends AbstractDatabase {
             } else {
                 throw new RunId("more than one sequence count for this runid ${runId}")
             }
-        }
-        else if (runIdList.size() > 1) {
+        } else if (runIdList.size() > 1) {
             log.error("runId List has more than one item -- there are ${runIdList.size()} items in the list deleting all")
         }
         log.debug("succesful completion of the setup for this runid/sequnce - ${runId}, ${seq.currentSeq}")

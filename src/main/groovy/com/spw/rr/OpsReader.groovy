@@ -8,16 +8,14 @@ import groovy.xml.slurpersupport.GPathResult
 class OpsReader {
     private final static Logger log = LoggerFactory.getLogger(OpsReader)
 
-    static DatabaseProcess db = null
+    private final DatabaseProcess db = DatabaseProcess.getInstance()
 
-    static void main(String[] args) {
-        log.debug("starting to process the Ops Data")
-        ParseFile parsedLocation = new ParseFile(VarData.dataHome, VarData.locationsFile)
-        log.debug("result of parse was ${parsedLocation.getParsed()}")
-        DoLocations locs = new DoLocations(parsedLocation.getParsed())
-        ParseFile parsedCars = new ParseFile(VarData.dataHome, VarData.carFile)
+    void processFiles(String dataHome, String carFileName, String locationsFileName ) {
+        log.debug("setting up to process - home is ${dataHome}, cars = ${carFileName} and locations = ${locationsFileName}")
+        ParseFile parsedlocations = new ParseFile(dataHome, locationsFileName)
+        ParseFile parsedCars = new ParseFile(dataHome, carFileName)
+        DoLocations locs = new DoLocations(parsedlocations.getParsed())
         DoCars cars = new DoCars(parsedCars.getParsed())
-        db = DatabaseProcess.getInstance()
         try {
             db.initialize("com/spw/mappers/MapperInterface.xml", VarData.dbUrl, VarData.dbUserid, VarData.dbPw)
             db.setRunId(VarData.runId, VarData.runComment)
@@ -32,5 +30,15 @@ class OpsReader {
             db.endRun()
         }
         log.info("Run complete")
+    }
+
+    void staticSetup() {
+        processFiles(VarData.dataHome, VarData.carFile, VarData.locationsFile)
+    }
+
+    static void main(String[] args) {
+        log.debug("starting to process the Ops Data")
+        OpsReader theReader = new OpsReader()
+        theReader.staticSetup()
     }
 }
