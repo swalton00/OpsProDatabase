@@ -15,6 +15,7 @@ class PropertySaver {
     Properties properties = new Properties()
 
     boolean inited = false
+    boolean dirty = false
 
 
     private File getHomeLocation() {
@@ -49,13 +50,18 @@ class PropertySaver {
             inputStream.close()
         }
         inited = true
+        dirty = false
     }
 
     public void writeValues() {
-        log.debug("writing the properties file")
-        FileOutputStream outputStream = new FileOutputStream(new File(getHomeLocation(), PROP_FILE_NAME))
-        properties.store(outputStream, "OpsCar saved values")
-        outputStream.close()
+        if (dirty) {
+            log.debug("writing the properties file")
+            FileOutputStream outputStream = new FileOutputStream(new File(getHomeLocation(), PROP_FILE_NAME))
+            properties.store(outputStream, "OpsCar saved values")
+            outputStream.close()
+        } else {
+            log.debug("skipped properties write as it was unchanged")
+        }
     }
 
     private void checkLoaded() {
@@ -67,17 +73,17 @@ class PropertySaver {
     }
 
     void saveInt(String prefix, String name, int value) {
-
         log.debug("saving an integer for${prefix} - ${name}")
         checkLoaded()
         properties.put(prefix + "." + name, Integer.toString(value))
+        dirty = true
     }
 
     Integer getInt(String prefix, String name) {
         log.debug("getting an integer for ${prefix} - ${name}")
         checkLoaded()
         String retVal
-        retVal = properties.get(prefix + "." + "name")
+        retVal = properties.get(prefix + "." + name)
         if (retVal != null) {
             return Integer.valueOf(retVal)
         } else return null
@@ -93,5 +99,6 @@ class PropertySaver {
         log.debug("saving a base String - key = ${key}")
         checkLoaded()
         properties.put(key, value)
+        dirty = true
     }
 }

@@ -39,8 +39,8 @@ class OpFrame extends JFrame implements ComponentListener{
         String name = e.getComponent().getName()
         log.trace("component resized event for ${name}")
         Dimension dim = e.getComponent().getSize()
-        saver.saveInt(name, "sizeWidth", dim.getWidth())
-        saver.saveInt(name, "sizeHeighth")
+        saver.saveInt(name, "sizeWidth", (int)dim.getWidth())
+        saver.saveInt(name, "sizeHeighth", (int)dim.getHeight())
     }
 
     @Override

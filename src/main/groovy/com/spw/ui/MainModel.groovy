@@ -15,10 +15,8 @@ import javax.swing.JPasswordField
 import javax.swing.JRadioButton
 import javax.swing.JTextField
 import javax.swing.SwingUtilities
-import java.awt.event.ActionEvent
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
-import java.util.regex.Pattern
 
 @ToString(includeNames = true, includePackage = false, includeFields = true)
 class MainModel implements FocusListener {
@@ -39,7 +37,6 @@ class MainModel implements FocusListener {
     boolean readyToCheck = false
     boolean fieldsValid = false
     boolean homeValid = false
-    boolean dbConnected = false
     boolean runReady = false
     boolean viewReady = false
 
@@ -50,6 +47,15 @@ class MainModel implements FocusListener {
     boolean validURL = false
     boolean validRunid = false
 
+    Integer nextSequence = 0
+    String savedUserid
+    String savedPw
+    String savedURL
+    String savedSchema
+    String savedRunId
+    String savedRunComment
+    String savedOpsHome
+
     JTextField userid = new JTextField("")
     JPasswordField pw = new JPasswordField("")
     JTextField url = new JTextField("")
@@ -57,7 +63,7 @@ class MainModel implements FocusListener {
     JTextField opsHome = new JTextField("")
     JTextField runId = new JTextField("")
     JTextField runComment = new JTextField("")
-    JTextField currentSequence = new JTextField("")
+    JLabel currentSequence = new JLabel("")
     JButton exitButton = new JButton("Exit")
     JButton saveValues = new JButton("Save Values")
     JButton collectButton = new JButton("Collect Data")
@@ -71,6 +77,23 @@ class MainModel implements FocusListener {
     JLabel messageLabel
 
     String priorValue
+    String newValue
+    Boolean valueChanged
+
+    /*
+            four stages
+                1. before ui displayed (don'ct check anything)
+                2. before all fields are valid (check opsHome, userid, pw, url, schema)
+                3. after enabling SaveValues (check for runId set
+                4. after enbaling dataCollect
+     */
+
+    public enum ProcessStage {
+        INITIAL, CHECKING, RUN_READY, COLLECTING
+    }
+
+    ProcessStage currentStage = ProcessStage.INITIAL
+    Integer sequnceCount = 0
 
 
     public MainModel() {
@@ -84,65 +107,100 @@ class MainModel implements FocusListener {
                 innerCheckFields()
             }
         }
+
     }
 
     private void innerCheckFields() {
         boolean foundError = false
-        String msgText = ""
-        if (userid.getText().isBlank()) {
-            validUserid = false
-        } else {
-            validUserid = true
-        }
-        if (new String(pw.getPassword()).isBlank()) {
-            validPassword = false
-        } else {
-            validPassword = true
-        }
-        if (url.getText().isBlank()) {
-            validURL = false
-        } else {
-            if (url.getText().startsWith("jdbc:h2:")) {
-                if (url.getText().contains(";SCHEMA=")) {
-                    log.trace("URL contains schema")
-                    foundError = true
-                    msgText = "URL should not contain the schema (will be set internally)"
-                } else {
-                    validURL = true
-                }
-            } else if (url.getText().startsWith("jdbc:")) {
-                log.trace("possible incorrect database - only H2 supported - URL should start with 'jdbc:h2:'")
-                foundError = true
-                msgText = "Possible incorrect database - only H2 supported 'jdbc:h2:....'"
+        if (currentStage == ProcessStage.CHECKING) {
+            foundError = false
+            String msgText = ""
+            if (userid.getText().isBlank()) {
+                validUserid = false
             } else {
-                log.trace("url wrong format - doesn't start with 'jdbc:'")
-                foundError = true
-                msgText = "Incorrect URL format - should start with 'jdbc:'"
+                validUserid = true
             }
-        }
-        if (schema.getText().isBlank()) {
-            validSchema = false
-        } else {
-            validSchema = true
-        }
-        if (foundError) {
-            message.setText(msgText, Message.Level.ERROR)
-        } else {
-            if (validHome &
-            validSchema &
-            validURL &
-            validPassword &
-            validUserid) {
-                message.setText("")
-                fieldsValid = true
-                saveValues.setEnabled(true)
+            if (new String(pw.getPassword()).isBlank()) {
+                validPassword = false
+            } else {
+                validPassword = true
             }
-        }
-        if (!validHome & !opsHome.getText().isBlank()) {
-            homeValue = opsHome.getText()
-            taskRunner.runIt(checkOpsHome)
+            if (url.getText().isBlank()) {
+                validURL = false
+            } else {
+                if (url.getText().startsWith("jdbc:h2:")) {
+                    if (url.getText().contains(";SCHEMA=")) {
+                        log.trace("URL contains schema")
+                        foundError = true
+                        msgText = "URL should not contain the schema (will be set internally)"
+                    } else {
+                        validURL = true
+                    }
+                } else if (url.getText().startsWith("jdbc:")) {
+                    log.trace("possible incorrect database - only H2 supported - URL should start with 'jdbc:h2:'")
+                    foundError = true
+                    msgText = "Possible incorrect database - only H2 supported 'jdbc:h2:....'"
+                } else {
+                    log.trace("url wrong format - doesn't start with 'jdbc:'")
+                    foundError = true
+                    msgText = "Incorrect URL format - should start with 'jdbc:'"
+                }
+            }
+            if (schema.getText().isBlank()) {
+                validSchema = false
+            } else {
+                validSchema = true
+            }
+            if (foundError) {
+                message.setText(msgText, Message.Level.ERROR)
+            } else {
+                if (validHome &
+                        validSchema &
+                        validURL &
+                        validPassword &
+                        validUserid) {
+                    message.setText("")
+                    fieldsValid = true
+                    saveValues.setEnabled(true)
+                }
+            }
+            if (!validHome & !opsHome.getText().isBlank()) {
+                homeValue = opsHome.getText()
+                taskRunner.runIt(checkOpsHome)
+            }
+        } else if (currentStage == ProcessStage.RUN_READY) {
+            if (!runId.getText().isBlank()) {
+                log.debug("ready to move on to collecting")
+                collectButton.setEnabled(true)
+                currentStage = ProcessStage.COLLECTING
+
+            }
         }
 
+
+    }
+
+    Runnable getSequence = () ->  {
+        if (SwingUtilities.isEventDispatchThread()) {
+            log.error("getSequence called from UI thread!")
+            return
+        }
+        saver.putBaseString("runId", savedRunId)
+        saver.putBaseString(("runComment"), savedRunComment)
+        nextSequence = db.getSequence(savedUserid, savedPw, savedURL, savedSchema, savedRunId)
+        Integer seqCount = db.getSequnceCount(savedUserid, savedPw, savedURL, savedSchema, savedRunId)
+        if (seqCount > 0) {
+            log.debug("sequence count is > 0 (${seqCount} - enabling views")
+            viewReady = true
+        }
+        SwingUtilities.invokeLater { ->
+            currentSequence.setText(Integer.toString(nextSequence))
+            if (viewReady) {
+                log.debug('now enabling views')
+                buttonView.setEnabled(true)
+                buttonExport.setEnabled(true)
+            }
+        }
     }
 
     String checkNotNull(String key) {
@@ -177,6 +235,33 @@ class MainModel implements FocusListener {
             priorValue = new String(e.getComponent().getPassword())
         }
         return
+    }
+
+    void checkRun() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            innerCheckRun()
+        } else {
+            SwingUtilities.invokeLater(innerCheckRun)
+        }
+    }
+
+    /**
+     * Inner cheeck of the values of runId - is it ready to enable the Collect button?
+     *    MUST be run on the UI thread
+     */
+    Runnable innerCheckRun = () ->  {
+        if (!runId.getText().isBlank()) {
+            log.debug("runId field is non-blank - ready to move to next stage")
+            currentStage = ProcessStage.COLLECTING
+            collectButton.setEnabled(true)
+            message.setText("", Message.Level.INFO)
+            savedRunId = runId.getText()
+            savedRunComment = runComment.getText()
+            taskRunner.runIt(getSequence)
+        } else {
+            message.setText("Enter a runid to enable collecting data", Message.Level.INFO)
+            currentStage = ProcessStage.RUN_READY
+        }
     }
 
     Runnable checkOpsHome = () -> {
@@ -221,14 +306,28 @@ class MainModel implements FocusListener {
             checkFields()
         }
         log.debug("result was validation was ${homeValid}")
-
     }
 
-    @Override
+     @Override
     void focusLost(FocusEvent e) {
         log.debug("focus lost")
-        if (!readyToCheck) return
-        innerCheckFields()
+        if (e.getComponent().getClass().equals(JPasswordField.class)) {
+            newValue = new String(e.getComponent().getPassword())
+        } else {
+            newValue  = e.getComponent().getText()
+        }
+        if (!newValue.equals(priorValue)){
+            valueChanged = true
+        } else {
+            valueChanged = false
+        }
+        if (currentStage.equals(ProcessStage.CHECKING)) {
+            innerCheckFields()
+        } else if (currentStage.equals(ProcessStage.RUN_READY)) {
+            if (e.getComponent().getName().equals("runid")) {
+                checkRun()
+            }
+        }
     }
 }
 

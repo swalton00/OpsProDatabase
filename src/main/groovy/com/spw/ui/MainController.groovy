@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory
 
 import javax.swing.JFileChooser
 import javax.swing.SwingUtilities
-import javax.swing.plaf.FileChooserUI
 import java.awt.event.ActionEvent
 
 class MainController {
@@ -40,6 +39,10 @@ class MainController {
         mm.schema.setText(newValue)
         newValue = saver.getBaseString("url")
         mm.url.setText(newValue)
+        newValue = saver.getBaseString("runId")
+        mm.runId.setText(newValue)
+        newValue = saver.getBaseString("runComment")
+        mm.runComment.setText(newValue)
         SwingUtilities.invokeLater({
             mv.start()
         })
@@ -51,29 +54,27 @@ class MainController {
     }
 
     def buttonExportAction = { ActionEvent ->
+        log.debug("got a request from the export button")
+    }
 
+    Runnable writeProperties  = () -> {
+        saver.writeValues()
     }
 
     def buttonExitAction = { ActionEvent event ->
         log.debug("received an exit Event")
+        runit.runIt(writeProperties)
         SwingUtilities.invokeLater { System.exit(0) }
 
     }
 
     def buttonCollectAction = { ActionEvent event ->
-
+        log.debug("collection requested")
     }
+
     def radioAction = { ActionEvent event ->
 
     }
-
-    String currentUserid
-    String currentPassword
-    String currentSchema
-    String currentOpsHome
-    String currentURL
-    String currentRunId
-    String currentRunComment
 
     Runnable validatorTask = () -> {
         log.debug("first line of the validator task")
@@ -84,36 +85,36 @@ class MainController {
         log.trace("about to run the database validate")
         boolean returnedValue = false
 
-        returnedValue = db.validateFieslds(currentUserid, currentPassword, currentURL, currentSchema, mm.message)
+        returnedValue = db.validateFieslds(mm.savedUserid, mm.savedPw, mm.savedURL, mm.savedSchema, mm.message)
 
         log.trace("database validate returned ${returnedValue}")
         if (returnedValue) {
             log.debug("all fields valid - saving the values")
-            saver.putBaseString("userid", currentUserid)
-            saver.putBaseString("password", currentPassword)
-            saver.putBaseString("url", currentURL)
-            saver.putBaseString("schema", currentSchema)
-            saver.putBaseString("opsHome", currentOpsHome)
+            saver.putBaseString("userid", mm.savedUserid)
+            saver.putBaseString("password", mm.savedPw)
+            saver.putBaseString("url", mm.savedURL)
+            saver.putBaseString("schema", mm.savedSchema)
+            saver.putBaseString("opsHome", mm.savedOpsHome)
+            if (!mm.savedRunId.isBlank()) {
+                saver.putBaseString("runId", mm.savedRunId)
+            }
+            if (!mm.savedRunComment.isBlank()) {
+                saver.putBaseString("runComment", mm.savedRunComment)
+            }
             saver.writeValues()
         }
-        log.trace("switching back to ui thread to ")
-        SwingUtilities.invokeLater {
-            log.debug("invoked later ")
-            mm.collectButton.setEnabled()
-            mm.runReady = returnedValue
-            if(mm.runReady & mm.validRunid) {
-                log.trace("enabling Run now")
-            }
-        }
+        mm.checkRun()
     }
 
     def buttonSaveValuesAction = { ActionEvent event ->
         log.debug("save values button pressed")
-        currentUserid = mm.userid.getText()
-        currentPassword = new String(mm.pw.getPassword())
-        currentSchema = mm.schema.getText()
-        currentOpsHome = mm.opsHome.getText()
-        currentURL = mm.url.getText()
+        mm.savedUserid = mm.userid.getText()
+        mm.savedPw= new String(mm.pw.getPassword())
+        mm.savedSchema = mm.schema.getText()
+        mm.savedOpsHome = mm.opsHome.getText()
+        mm.savedURL = mm.url.getText()
+        mm.savedRunId = mm.runId.getText()
+        mm.savedRunComment = mm.runComment.getText()
         mm.saveValues.setEnabled(false)
         runit.runIt(validatorTask)
     }

@@ -42,6 +42,7 @@ class MainView {
 
     public void start() {
         OpFrame base = new OpFrame()
+        base.addComponentListener(base)
         base.getContentPane().setLayout(new MigLayout())
         base.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
         base.setTitle("Ops Progress Main")
@@ -129,7 +130,7 @@ class MainView {
         contentPanel.add(labelSequence, "right")
         mm.currentSequence.setEnabled(false)
         mm.currentSequence.setToolTipText("Disabled field showing the current run number")
-        mm.currentSequence.setColumns(8)
+        makeLarger(mm.currentSequence)
         contentPanel.add(mm.currentSequence, "wrap")
         mm.collectButton.setEnabled(false)
         mm.collectButton.setToolTipText("Press this button to read and record the OpsPro Car and Location values")
@@ -197,6 +198,8 @@ class MainView {
         }
         base.setLocation(frameLocX, frameLocY)
         mm.readyToCheck = true
+        mm.currentStage = MainModel.ProcessStage.CHECKING
+        mm.checkFields()
         base.setVisible(true)
     }
 
