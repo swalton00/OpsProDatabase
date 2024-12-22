@@ -1,6 +1,7 @@
 package com.spw.ui
 
 import com.spw.rr.DatabaseProcess
+import com.spw.rr.OpsReader
 import com.spw.utility.PropertySaver
 import com.spw.utility.RunTasks
 import org.slf4j.Logger
@@ -57,7 +58,7 @@ class MainController {
         log.debug("got a request from the export button")
     }
 
-    Runnable writeProperties  = () -> {
+    Runnable writeProperties = () -> {
         saver.writeValues()
     }
 
@@ -70,6 +71,21 @@ class MainController {
 
     def buttonCollectAction = { ActionEvent event ->
         log.debug("collection requested")
+        mm.collectButton.setEnabled(false)
+        runit.runIt(collectTask)
+    }
+
+    Runnable collectTask = () -> {
+        log.debug("first line of the collect task")
+        mm.message.setText("Collecting data")
+        OpsReader ops = new OpsReader()
+        ops.processFiles(mm.savedOpsHome, mm.savedURL + ";SCHEMA=" + mm.savedSchema, mm.savedUserid, mm.savedPw)
+        mm.getSequence()
+        SwingUtilities.invokeLater { ->
+            log.debug("back from collection - reeneablling collect button")
+            mm.collectButton.setEnabled(true)
+            mm.message.setText("")
+        }
     }
 
     def radioAction = { ActionEvent event ->
@@ -109,7 +125,7 @@ class MainController {
     def buttonSaveValuesAction = { ActionEvent event ->
         log.debug("save values button pressed")
         mm.savedUserid = mm.userid.getText()
-        mm.savedPw= new String(mm.pw.getPassword())
+        mm.savedPw = new String(mm.pw.getPassword())
         mm.savedSchema = mm.schema.getText()
         mm.savedOpsHome = mm.opsHome.getText()
         mm.savedURL = mm.url.getText()

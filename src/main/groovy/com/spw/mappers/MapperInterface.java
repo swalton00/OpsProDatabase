@@ -1,6 +1,6 @@
 package com.spw.mappers;
 import com.spw.rr.Car;
-import com.spw.rr.Location;
+import com.spw.rr.Track;
 
 import java.util.List;
 public interface MapperInterface {
@@ -20,6 +20,6 @@ public interface MapperInterface {
 
      public void insertRunLoc(RunLoc runLoc);
 
-     public void mergeLocation(Location location);
+     public void mergeLocation(Track location);
 
 }

@@ -11,7 +11,7 @@
     </settings>
     <typeAliases>
         <typeAlias type="com.spw.rr.Car" alias="Car"/>
-        <typeAlias type="com.spw.rr.Location" alias="Location"/>
+        <typeAlias type="com.spw.rr.Track" alias="Location"/>
         <package name="com.spw.mappers"/>
     </typeAliases>
     <environments default="development">

@@ -216,7 +216,7 @@ void insertRunLoc(RunLoc runLoc) {
     map.insertRunLoc(runLoc)
 }
 
-void mergeLocation(Location thisLoc) {
+void mergeLocation(Track thisLoc) {
     log.debug("inserting or updating this location ${thisLoc}")
     MapperInterface map = session.getMapper(MapperInterface.class)
     map.mergeLocation(thisLoc)

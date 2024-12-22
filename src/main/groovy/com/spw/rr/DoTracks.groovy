@@ -5,21 +5,21 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-class DoLocations {
-    private static final Logger log = LoggerFactory.getLogger(DoLocations.class)
+class DoTracks {
+    private static final Logger log = LoggerFactory.getLogger(DoTracks.class)
 
-    Hashtable<String, Location> locValues = new Hashtable<>()
+    Hashtable<String, Track> locValues = new Hashtable<>()
 
-    DoLocations(GPathResult current) {
+    DoTracks(GPathResult current) {
         log.debug("processing the locations")
         def locations = current
         int locCount = current.locations.location.size()
         log.debug("size of location list is ${locCount}")
         for (i in 0..<locCount) {
             int trackCount = current.locations.location[i].track.size()
-            println(" there are ${trackCount} tracks at location number ${i}")
+            log.debug(" there are ${trackCount} tracks at location number ${i}")
             for (j in 0..<trackCount) {
-                Location thisLoc = new Location()
+                Track thisLoc = new Track()
                 thisLoc.locId = current.locations.location[i].track[j].'@id'.text()
                 thisLoc.locLocId = current.locations.location[i].'@id'.text()
                 thisLoc.locName = current.locations.location[i].track[j].'@name'.text()
@@ -28,10 +28,10 @@ class DoLocations {
                 locValues.put(thisLoc.locId, thisLoc)
             }
         }
-        log.debug("location processing complete with values ${locValues}")
+        log.debug("location processing complete with track count =  ${locValues.size()}")
     }
 
-    Hashtable<String, Location> getLocations() {
+    Hashtable<String, Track> getLocations() {
         return locValues
     }
 }

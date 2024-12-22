@@ -1,6 +1,6 @@
 package com.spw.rr
 
-import com.spw.mappers.MapperInterface
+
 import com.spw.mappers.RunLoc
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -26,7 +26,7 @@ class ProcessData {
         }
     }
 
-    public static void doLocations(Hashtable<String, Location> locList) {
+    public static void doLocations(Hashtable<String, Track> locList) {
         log.debug("processing a locations list of ${locList.size()} entries")
         String currentRun = VarData.runId
         DatabaseProcess db = DatabaseProcess.getInstance()
