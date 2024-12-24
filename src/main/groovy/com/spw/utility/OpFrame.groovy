@@ -3,13 +3,14 @@ package com.spw.utility
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import javax.swing.JDialog
 import javax.swing.JFrame
 import java.awt.Dimension
 import java.awt.Point
 import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
 
-class OpFrame extends JFrame implements ComponentListener{
+class OpFrame extends JDialog implements ComponentListener{
     private static final Logger log = LoggerFactory.getLogger(OpFrame.class)
     private static final PropertySaver saver = PropertySaver.getInstance()
     private static final String NAME_HEIGHT = "sizeHeight"

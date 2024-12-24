@@ -44,7 +44,7 @@ class MainView {
         OpFrame base = new OpFrame()
         base.addComponentListener(base)
         base.getContentPane().setLayout(new MigLayout())
-        base.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
+        base.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
         base.setTitle("Ops Progress Main")
         Integer frameWidth = saver.getInt("main", base.getWidthName())
         if (frameWidth == null) {
