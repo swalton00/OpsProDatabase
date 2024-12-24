@@ -23,7 +23,7 @@ class OpsReader {
             db.setRunId(VarData.runId, VarData.runComment)
             Integer currentSequence = db.getCurrentSequence()
             /* need to do locations first since runLocs will reference Locations */
-            ProcessData.doLocations(locs.getLocations())
+            ProcessData.doLocations(locs.getLocations(), locs.getTracks())
             ProcessData.doCars(cars.getCarList())
 
         } catch (Exception e) {

@@ -7,4 +7,5 @@ class RunId {
     int id
     String runid
     String comment
+    Integer sequenceNumber
 }

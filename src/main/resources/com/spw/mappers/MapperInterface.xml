@@ -7,53 +7,34 @@
         select
             id,
             runid,
-            comments as comment
+            comments as comment,
+            seqNum as sequenceNumber
         from RunIds where runId = #{runid}
     </select>
     <update id="updateRunId" parameterType="RunId">
         update runids set runid = #{runid},
-        comments = #{comment}
+        comments = #{comment},
+        seqNum = #{sequenceNumber}
     </update>
-    <insert id="insertRunId" useGeneratedKeys="true">
+    <insert id="insertRunId" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO runids
             (
                 RunId,
                 comments,
-                Created_Date
+                seqNum
             )
         VALUES
             (
                 #{runid},
                 #{comment},
-                CURRENT_TIMESTAMP
+                #{sequenceNumber}
         )
     </insert>
-    <insert id="insertSequence">
-        INSERT INTO seq_value
-            (
-                current_seq,
-                runid
-            )
-        VALUES
-        (
-            #{currentSeq},
-            #{runId}
-        );
-    </insert>
-    <update id="updateSequence">
-        UPDATE
-            seq_value
-        SET
-            current_seq = #{currentSeq}
-        WHERE
-            runid = #{runId};
-    </update>
-    <select id="getSequenceList">
+    <select id="getSequenceMax">
         SELECT
-            id,
-            runId,
-            current_seq as currentSeq
-        FROM seq_value
+            COALESCE(MAX(Seq_num), 0)
+        FROM
+            run_locs
         WHERE
             runId = #{runId}
     </select>
@@ -76,7 +57,7 @@
                 runId,
                 seq_num,
                 carId,
-                locId,
+                trkId,
                 load
             )
 
@@ -84,24 +65,81 @@
                 #{runId},
                 #{seqNum},
                 #{carId},
-                #{locId},
+                #{trkId},
                 #{load}
             )
     </insert>
-    <update id="mergeLocation">
-        MERGE INTO locations
+    <select id="getTrack">
+        SELECT
+            id,
+            runId,
+            trkId,
+            parentId,
+            parentXmlId,
+            trkName,
+            trackType,
+            trkLength
+        FROM
+            tracks
+        WHERE
+            runid = #{runId}
+        AND trkId = #{trkId}
+    </select>
+    <update id="updateTrack">
+        UPDATE
+            tracks
+        SET
+            parentId = #{parentId},
+            parentXmlId = #{parentXmlId},
+            trkName = #{trkName},
+            trackType = #{trackType},
+            trkLength = #{trkLength}
+        WHERE
+            id = #{id} ;
+
+    </update>
+    <insert id="insertTrack" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tracks
             (
                 runId,
-                locId,
-                locName,
+                trkId,
+                parentId,
+                parentXmlId,
+                trkName,
                 trackType,
-                locLength
-            ) KEY (runId, locId) VALUES (
+                trkLength
+            ) VALUES (
                 #{runId},
-                #{locId},
-                #{locName},
+                #{trkId},
+                #{parentId},
+                #{parentXmlId},
+                #{trkName},
                 #{trackType},
-                #{locLength}
+                #{trkLength}
             )
-    </update>
+    </insert>
+    <insert id="insertLocation" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO locations
+             (
+                runId,
+                xmlid,
+                name
+            )  VALUES (
+                #{runId},
+                #{xmlId},
+                #{name}
+            )
+    </insert>
+    <select id="getLocation" parameterType="Location">
+        SELECT
+            id,
+            runid,
+            xmlid,
+            name
+        FROM
+            locations
+        WHERE
+            runid = #{runId}
+        AND xmlid = #{xmlId}
+    </select>
 </mapper>

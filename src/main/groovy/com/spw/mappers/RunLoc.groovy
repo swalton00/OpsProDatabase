@@ -7,6 +7,6 @@ class RunLoc {
     String runId
     int     seqNum
     String  carId
-    String  locId
+    String trkId
     String  load
 }

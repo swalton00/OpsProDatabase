@@ -20,20 +20,30 @@ class ProcessData {
             runLoc.runId = currentRun
             runLoc.carId = thisCar.carId
             runLoc.seqNum = currentSeq
-            runLoc.locId = thisCar.carSecLocId
+            runLoc.trkId = thisCar.carSecLocId
             runLoc.load = thisCar.carLoad
             db.insertRunLoc(runLoc)
         }
     }
 
-    public static void doLocations(Hashtable<String, Track> locList) {
-        log.debug("processing a locations list of ${locList.size()} entries")
+    public static void doLocations(Hashtable<String, Location> locList, Hashtable<String, Track> tracks) {
+        log.debug("processing a locations list of ${locList.size()} entries with ${tracks.size} tracks")
         String currentRun = VarData.runId
         DatabaseProcess db = DatabaseProcess.getInstance()
-        int currentSeq = db.getCurrentSequence()
-        locList.values().forEach { thisLoc ->
+        Set<String> keyList = locList.keySet()
+        keyList.each {
+            log.debug("processing location key of ${it} with a value of ${locList.get(it)}")
+            Location thisLoc = locList.get(it)
             thisLoc.runId = currentRun
-            db.mergeLocation(thisLoc)
+            thisLoc = db.findLocation(thisLoc)
+            locList.put(it, thisLoc)
+            log.debug("processed location key of ${it} with a value of ${locList.get(it)}")
+        }
+        tracks.values().forEach { thisTrk ->
+            //log.debug("Processing track ${thisTrk}")
+            thisTrk.runId = currentRun
+            thisTrk.parentId = locList.get(thisTrk.parentXmlId).id
+            db.mergeTrack(thisTrk)
         }
     }
 

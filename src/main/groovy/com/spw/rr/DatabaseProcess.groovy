@@ -82,11 +82,11 @@ class DatabaseProcess extends AbstractDatabase {
     }
 
 
-String userid
-String pw
-String schema
-String url
-Message mess
+    String userid
+    String pw
+    String schema
+    String url
+    Message mess
 
 /**
  * Returns TRUE is the fields represent a valid database connection
@@ -96,130 +96,130 @@ Message mess
  * @param schema
  * @return true if the fields result in a valid database connection
  */
-boolean validateFieslds(String userid, String pw, String url, String schema, Message returnMessage) {
-    log.debug("now in the validator")
-    boolean returnValue = false // return false if there are any issues
-    Connection conn = null
-    log.debug("validating parameters ${userid}, ${url}, ${schema}")
-    try {
-        log.debug("testing the database connection")
-        conn = DriverManager.getConnection(url, userid, pw)
-        if (conn != null) {
-            log.trace("got a good connection with that URL, userid and password")
-            PreparedStatement schemaStatement = conn.prepareStatement(SCHEMA_TEST)
-            schemaStatement.setString(1, schema.toUpperCase())
-            ResultSet schemaResult = schemaStatement.executeQuery()
-            if (!schemaResult.next()) {
-                log.error("Should have returned a count of number of matching schemas - 0 or 1, got no result set")
-            } else {
-                int matchCount = schemaResult.getInt(1)
-                int tableCount = 0
-                if (matchCount == 0) {
-                    log.trace("no matching schema - creating")
-                    PreparedStatement stmt = conn.prepareStatement(CREATE_SCHEMA + schema.toString())
-                    stmt.execute()
-                } else if (matchCount == 1) {
-                    log.trace("schema already present - checking for tables with schema ${schema} and sql ${TABLE_TEST}")
-                    PreparedStatement stmt = conn.prepareStatement(TABLE_TEST)
-                    stmt.setString(1, schema.toUpperCase())
-                    ResultSet rs = stmt.executeQuery()
-                    if (!rs.next()) {
-                        log.error("no result set returned on getting table count")
-                        throw new RuntimeException("no result set from select count(*) for table count")
-                    }
-                    tableCount = rs.getInt(1)  // get count of tables in this schema
-                    log.trace("table count was ${tableCount}")
-                }
-                if (tableCount == 0) {
-                    returnValue = createTables(conn, schema)
-                    log.debug("create tables returned ${returnValue}")
-                } else if (tableCount != 5) {
-                    log.error("got an incorrect table count - value was ${tableCount}")
-                    throw new RuntimeException("Incorrect table count in schema ${schema} - count is ${tableCount}")
+    boolean validateFieslds(String userid, String pw, String url, String schema, Message returnMessage) {
+        log.debug("now in the validator")
+        boolean returnValue = false // return false if there are any issues
+        Connection conn = null
+        log.debug("validating parameters ${userid}, ${url}, ${schema}")
+        try {
+            log.debug("testing the database connection")
+            conn = DriverManager.getConnection(url, userid, pw)
+            if (conn != null) {
+                log.trace("got a good connection with that URL, userid and password")
+                PreparedStatement schemaStatement = conn.prepareStatement(SCHEMA_TEST)
+                schemaStatement.setString(1, schema.toUpperCase())
+                ResultSet schemaResult = schemaStatement.executeQuery()
+                if (!schemaResult.next()) {
+                    log.error("Should have returned a count of number of matching schemas - 0 or 1, got no result set")
                 } else {
-                    log.debug("all looks good - validated!")
-                    returnValue = true
-                }
+                    int matchCount = schemaResult.getInt(1)
+                    int tableCount = 0
+                    if (matchCount == 0) {
+                        log.trace("no matching schema - creating")
+                        PreparedStatement stmt = conn.prepareStatement(CREATE_SCHEMA + schema.toString())
+                        stmt.execute()
+                    } else if (matchCount == 1) {
+                        log.trace("schema already present - checking for tables with schema ${schema} and sql ${TABLE_TEST}")
+                        PreparedStatement stmt = conn.prepareStatement(TABLE_TEST)
+                        stmt.setString(1, schema.toUpperCase())
+                        ResultSet rs = stmt.executeQuery()
+                        if (!rs.next()) {
+                            log.error("no result set returned on getting table count")
+                            throw new RuntimeException("no result set from select count(*) for table count")
+                        }
+                        tableCount = rs.getInt(1)  // get count of tables in this schema
+                        log.trace("table count was ${tableCount}")
+                    }
+                    if (tableCount == 0) {
+                        returnValue = createTables(conn, schema)
+                        log.debug("create tables returned ${returnValue}")
+                    } else if (tableCount != 5) {
+                        log.error("got an incorrect table count - value was ${tableCount}")
+                        throw new RuntimeException("Incorrect table count in schema ${schema} - count is ${tableCount}")
+                    } else {
+                        log.debug("all looks good - validated!")
+                        returnValue = true
+                    }
 
+                }
+            }
+        } catch (Exception e) {
+            log.error("caught an exception validating fields", e)
+            returnMessage.setText("Error validating fields", Message.Level.ERROR)
+        } finally {
+            log.debug("closing the connection (if any)")
+            if (conn != null) {
+                conn.close()
             }
         }
-    } catch (Exception e) {
-        log.error("caught an exception validating fields", e)
-        returnMessage.setText("Error validating fields", Message.Level.ERROR)
-    } finally {
-        log.debug("closing the connection (if any)")
-        if (conn != null) {
-            conn.close()
-        }
+        log.debug("validator complete - return value is ${returnValue}")
+        return returnValue
     }
-    log.debug("validator complete - return value is ${returnValue}")
-    return returnValue
-}
 
-void setRunId(String runId, String runComment) {
-    log.debug("setting runid to ${runId}")
-    MapperInterface map = session.getMapper(MapperInterface.class)
-    RunId newRunId = new RunId()
-    newRunId.runid = runId
-    newRunId.comment = runComment
-    List<RunId> runIdList = map.selectRunId(newRunId)
-    SequenceValue seq = new SequenceValue()
-    seq.runId = runId
-    currentSequence = 1
-    seq.currentSeq = currentSequence
-    /*
-        if RunId list exists, update it and set RunSequence to 1
-        If it doesn't, insert it and create new RunSequence at 1
-     */
-    if (runIdList.isEmpty()) {
-        log.debug("runId list is empty - creating one")
-        int insertCount = map.insertRunId(newRunId)
-        log.debug("new runid is now ${newRunId} -- count was ${insertCount}")
-        insertCount = map.insertSequence(seq)
-        log.debug("SequenceValue is now ${seq} and count is ${insertCount}")
-
-    } else if (runIdList.size() == 1) {
-        List<SequenceValue> seqList = map.getSequenceList(newRunId.runid)
-        log.debug("got a sequence list of size ${seqList.size()}")
-        if (seqList.size() == 0) {
-            currentSequence = 1
-            map.insertSequence(seq)
-        } else if (seqList.size() == 1) {
-            SequenceValue curSeq = seqList.get(0)
-            currentSequence = curSeq.currentSeq + 1
-            curSeq.currentSeq = currentSequence
-            map.updateSequence(curSeq)
-            log.debug("updating Seq number to ${currentSequence}")
+    void setRunId(String runId, String runComment) {
+        log.debug("setting runid to ${runId}")
+        MapperInterface map = session.getMapper(MapperInterface.class)
+        RunId thisRunId = map.selectRunId(runId)
+        Integer nextSequence = map.getSequenceMax(runId) + 1
+        currentSequence = nextSequence
+        if (thisRunId == null) {
+            log.debug("don't have a current sequnce -- setting it to ${nextSequence}")
+            RunId newRunId = new RunId()
+            newRunId.runid = runId
+            newRunId.comment = runComment
+            newRunId.sequenceNumber = nextSequence
+            map.insertRunId(newRunId)
         } else {
-            throw new RunId("more than one sequence count for this runid ${runId}")
+            log.debug("updating sequence to new value of ${nextSequence}")
+            thisRunId.comment = runComment
+            thisRunId.sequenceNumber = nextSequence
+            map.updateRunId(thisRunId)
         }
-    } else if (runIdList.size() > 1) {
-        log.error("runId List has more than one item -- there are ${runIdList.size()} items in the list deleting all")
     }
-    log.debug("succesful completion of the setup for this runid/sequnce - ${runId}, ${seq.currentSeq}")
-}
 
-int getCurrentSequence() {
-    log.debug("returning current sequence number which is ${currentSequence}")
-    return currentSequence
-}
+    int getCurrentSequence() {
+        log.debug("returning current sequence number which is ${currentSequence}")
+        return currentSequence
+    }
 
-void mergeCar(Car thisCar) {
-    log.debug("merging current car into database ${thisCar}")
-    MapperInterface map = session.getMapper(MapperInterface.class)
-    map.mergeCar(thisCar)
-}
+    void mergeCar(Car thisCar) {
+        log.debug("merging current car into database ${thisCar}")
+        MapperInterface map = session.getMapper(MapperInterface.class)
+        map.mergeCar(thisCar)
+    }
 
-void insertRunLoc(RunLoc runLoc) {
-    log.debug("inserting this runLoc ${runLoc}")
-    MapperInterface map = session.getMapper(MapperInterface.class)
-    map.insertRunLoc(runLoc)
-}
+    void insertRunLoc(RunLoc runLoc) {
+        log.debug("inserting this runLoc ${runLoc}")
+        MapperInterface map = session.getMapper(MapperInterface.class)
+        map.insertRunLoc(runLoc)
+    }
 
-void mergeLocation(Track thisLoc) {
-    log.debug("inserting or updating this location ${thisLoc}")
-    MapperInterface map = session.getMapper(MapperInterface.class)
-    map.mergeLocation(thisLoc)
-}
+    Location findLocation(Location location) {
+        log.debug("finding or creating the Location record")
+        MapperInterface map = session.getMapper(MapperInterface.class)
+        Location locValue = map.getLocation(location)
+        if (locValue == null) {
+            log.debug("Location was not found - inserting")
+            map.insertLocation(location)
+            locValue = location
+            log.debug("resulting location was ${location}")
+        }
+        return locValue
+    }
+
+    void mergeTrack(Track thisTrk) {
+        log.debug("inserting or updating this location ${thisTrk}")
+
+        MapperInterface map = session.getMapper(MapperInterface.class)
+        Track original = map.getTrack(thisTrk)
+        if (original == null) {
+            log.debug("track was not found - adding it - ${thisTrk}")
+            map.insertTrack(thisTrk)
+        } else {
+            thisTrk.id = original.id
+            log.debug("updating track to be ${thisTrk}")
+            map.updateTrack(thisTrk)
+        }
+    }
 
 }
