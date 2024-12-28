@@ -51,11 +51,7 @@ class MainController {
 
     def buttonViewAction = { ActionEvent event ->
         log.debug("got a request from the view button")
-
-    }
-
-    def buttonExportAction = { ActionEvent ->
-        log.debug("got a request from the export button")
+        runit.runIt(createSelectTask)
     }
 
     Runnable writeProperties = () -> {
@@ -78,8 +74,10 @@ class MainController {
     Runnable collectTask = () -> {
         log.debug("first line of the collect task")
         mm.message.setText("Collecting data")
+        db.initialize( mm.savedURL + ";SCHEMA=" + mm.savedSchema, mm.savedUserid, mm.savedPw)
+        db.setRunId(mm.savedRunId, mm.savedRunComment)
         OpsReader ops = new OpsReader()
-        ops.processFiles(mm.savedOpsHome, mm.savedURL + ";SCHEMA=" + mm.savedSchema, mm.savedUserid, mm.savedPw)
+        ops.processFiles(mm.savedOpsHome,)
         mm.getSequence()
         SwingUtilities.invokeLater { ->
             log.debug("back from collection - reeneablling collect button")
@@ -87,6 +85,13 @@ class MainController {
             mm.message.setText("")
         }
     }
+
+    Runnable createSelectTask  = () -> {
+        log.debug("creating the Select elements")
+        SelectController sc = new SelectController(mm.savedRunId, mv.mainDialog)
+        sc.init()
+    }
+
 
     def radioAction = { ActionEvent event ->
 

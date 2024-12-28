@@ -12,9 +12,10 @@
         from RunIds where runId = #{runid}
     </select>
     <update id="updateRunId" parameterType="RunId">
-        update runids set runid = #{runid},
-        comments = #{comment},
-        seqNum = #{sequenceNumber}
+        update runids
+            set comments = #{comment},
+            seqNum = #{sequenceNumber}
+        where runid = #{runid}
     </update>
     <insert id="insertRunId" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO runids

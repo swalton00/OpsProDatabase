@@ -1,11 +1,12 @@
 package com.spw.ui
 
 import com.spw.utility.Message
-import com.spw.utility.OpFrame
+import com.spw.utility.OpDialog
 import com.spw.utility.PropertySaver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.swing.ButtonGroup
+import javax.swing.JDialog
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JSeparator
@@ -21,6 +22,8 @@ import net.miginfocom.swing.MigLayout;
 class MainView {
     MainController mc
     MainModel mm
+    JDialog mainDialog
+
 
     private static final Logger log = LoggerFactory.getLogger(MainView.class)
     private static final PropertySaver saver = PropertySaver.getInstance()
@@ -30,20 +33,20 @@ class MainView {
         this.mm = mm
     }
 
-    private void makeLarger(JLabel field) {
+    public static void makeLarger(JLabel field) {
         makeLarger(field, 24)
     }
 
-    private void makeLarger(JLabel field, int newSize) {
+    public static void makeLarger(JLabel field, int newSize) {
         Font currentFont = field.getFont()
         Font newFont = new Font(currentFont.getFontName(), Font.BOLD, newSize)
         field.setFont(newFont)
     }
 
     public void start() {
-        OpFrame base = new OpFrame()
-        base.addComponentListener(base)
-        base.getContentPane().setLayout(new MigLayout())
+        OpDialog base = new OpDialog()
+        mainDialog = base
+        base.getContentPane().setLayout(new MigLayout("fillx"))
         base.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
         base.setTitle("Ops Progress Main")
         Integer frameWidth = saver.getInt("main", base.getWidthName())
@@ -56,7 +59,7 @@ class MainView {
             frameHeight = 400
             saver.saveInt("main", base.getHeightName(), 400)
         }
-        base.setSize(250, 400)
+        base.setSize(frameWidth, frameHeight)
         base.getContentPane().setSize(250, 400)
         base.setName("main")
         JLabel appTitle = new JLabel("Ops Progress")
@@ -143,22 +146,9 @@ class MainView {
         JLabel labelViews = new JLabel("Views")
         makeLarger(labelViews)
         contentPanel.add(labelViews, "center, span 2, wrap")
-        ButtonGroup viewGroup = new ButtonGroup()
-        viewGroup.add(mm.radioCarByLoc)
-        JPanel viewPanel = new JPanel(new MigLayout())
-        mm.radioCarByLoc.setSelected(true)
-        mm.radioLocByCar.addActionListener(mc.radioAction)
-        mm.radioCarByLoc.addActionListener(mc.radioAction)
-        viewGroup.add(mm.radioLocByCar)
-        viewPanel.add(mm.radioCarByLoc)
-        viewPanel.add(mm.radioLocByCar)
         mm.buttonView.addActionListener(mc.buttonViewAction)
         mm.buttonView.setEnabled(false)
-        viewPanel.add(mm.buttonView)
-        mm.buttonExport.addActionListener(mc.buttonExportAction)
-        mm.buttonExport.setEnabled(false)
-        viewPanel.add(mm.buttonExport)
-        contentPanel.add(viewPanel, "center, span 2, wrap")
+        contentPanel.add(mm.buttonView, "center, wrap")
         mm.exitButton.addActionListener(mc.buttonExitAction)
         base.getContentPane().add(contentPanel, "center, span 2,wrap")
 

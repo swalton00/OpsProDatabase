@@ -4,19 +4,29 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import javax.swing.JDialog
-import javax.swing.JFrame
 import java.awt.Dimension
 import java.awt.Point
 import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
 
-class OpFrame extends JDialog implements ComponentListener{
-    private static final Logger log = LoggerFactory.getLogger(OpFrame.class)
+class OpDialog extends JDialog implements ComponentListener{
+    private static final Logger log = LoggerFactory.getLogger(OpDialog.class)
     private static final PropertySaver saver = PropertySaver.getInstance()
     private static final String NAME_HEIGHT = "sizeHeight"
     private static final String NAME_WIDTH = "sizeWidth"
     private static final String NAME_X = "x"
     private static final String NAME_Y = "y"
+
+    OpDialog(java.awt.Dialog parent, String title, boolean modal) {
+        super(parent, title, modal)
+        log.debug("in the extended constructor - parent is ${parent}")
+        this.addComponentListener(this)
+    }
+
+    OpDialog() {
+        super()
+    }
+
 
     String getXname() {
         return NAME_X
@@ -40,8 +50,8 @@ class OpFrame extends JDialog implements ComponentListener{
         String name = e.getComponent().getName()
         log.trace("component resized event for ${name}")
         Dimension dim = e.getComponent().getSize()
-        saver.saveInt(name, "sizeWidth", (int)dim.getWidth())
-        saver.saveInt(name, "sizeHeighth", (int)dim.getHeight())
+        saver.saveInt(name, NAME_WIDTH, (int)dim.getWidth())
+        saver.saveInt(name, NAME_HEIGHT, (int)dim.getHeight())
     }
 
     @Override

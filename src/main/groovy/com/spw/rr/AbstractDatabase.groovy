@@ -15,14 +15,19 @@ abstract class AbstractDatabase {
     SqlSession session = null
 
 
-    void initialize(String mapper, String url, String userid, String password) {
+    /**
+     * Initialize the Mybatis environment
+     * @param url
+     * @param userid
+     * @param password
+     */
+    void initialize(String url, String userid, String password) {
         log.debug("AbstractDatabase initializing")
         String resource = "mybatis-config.xml";
         Properties props = new Properties()
         props.put("url", url)
         props.put("username", userid)
         props.put("password", password)
-        props.put("mapper", mapper)
         InputStream inputStream = Resources.getResourceAsStream(resource);
         sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream, props );
         session = sqlSessionFactory.openSession(org.apache.ibatis.session.ExecutorType.REUSE, true)
@@ -30,6 +35,9 @@ abstract class AbstractDatabase {
 
     void endRun() {
         log.debug("ending the run -- closing the connection")
-        session.close()
+        if (session != null) {
+            session.close()
+        }
+
     }
 }

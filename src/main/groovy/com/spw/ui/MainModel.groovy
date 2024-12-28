@@ -70,8 +70,7 @@ class MainModel implements FocusListener {
     JButton buttonView = new JButton("View Data")
     JButton buttonExport = new JButton("Export Data")
     JButton buttonOpsHome = new JButton("Select Operations Home")
-    JRadioButton radioCarByLoc = new JRadioButton("Cars by Location")
-    JRadioButton radioLocByCar = new JRadioButton("Locations by car")
+
     Message message = new Message()
     JPanel messagePanel
     JLabel messageLabel

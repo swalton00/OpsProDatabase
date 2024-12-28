@@ -26,6 +26,6 @@
         </environment>
     </environments>
     <mappers>
-        <mapper resource="${mapper}"/>
+        <mapper resource="com/spw/mappers/MapperInterface.xml"/>
     </mappers>
 </configuration>
