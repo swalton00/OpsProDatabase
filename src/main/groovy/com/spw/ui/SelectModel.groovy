@@ -1,13 +1,23 @@
 package com.spw.ui
 
+import com.spw.mappers.ViewDatabase
+import com.spw.view.ViewCar
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JRadioButton
+import java.awt.Component
 
 class SelectModel {
+
+    SelectModel(String runId) {
+        this.runId = runId
+    }
+
+    private static ViewDatabase viewdb = ViewDatabase.getInstance()
+    String runId
     private static final Logger log = LoggerFactory.getLogger(SelectModel.class)
 
     JRadioButton radioCarByLoc = new JRadioButton("By Car")
@@ -16,23 +26,24 @@ class SelectModel {
     JRadioButton rbAllCars = new JRadioButton("All cars")
     JRadioButton rbMovedCars = new JRadioButton("Moved")
     JRadioButton rbSpecific = new JRadioButton(("Specific cars"))
-    List<JRadioButton> rbCarList = new ArrayList<>([rbAllCars, rbMovedCars, rbSpecific])
+    List<Component> rbCarList = new ArrayList<>([rbAllCars, rbMovedCars, rbSpecific, carBox])
 
 
-    String[] carList = ["PRR123", "ARLX123456"]
+    List<ViewCar> carList
 
-    JComboBox<String> carBox = new JComboBox<>(carList)
+    JComboBox<ViewCar> carBox = new JComboBox<>()
 
     JRadioButton rbLocsAll = new JRadioButton("All Locations")
     JRadioButton rbLocsWith = new JRadioButton("Locations with Cars")
     JRadioButton rbLocsMoved = new JRadioButton("Cars Moved")
     JRadioButton rbLocsSpecific = new JRadioButton("Specific Locations")
-    List<JRadioButton> rbLocList = new ArrayList<>([rbLocsAll, rbLocsWith, rbLocsMoved, rbLocsSpecific])
-
     String[] locList = ["Earls Energy", "The Yard"]
     String[] trkList = ["Track 1", "Track 2"]
     JComboBox<String> locBox = new JComboBox<>(locList)
     JComboBox<String> trkBox = new JComboBox<>(trkList)
+    List<Component> rbLocList = new ArrayList<>([rbLocsAll, rbLocsWith, rbLocsMoved, rbLocsSpecific, locBox, trkBox])
+
+
 
     JButton buttonReturn = new JButton("Close Dialog")
     JButton buttonExport = new JButton("Export Data")
@@ -40,5 +51,9 @@ class SelectModel {
 
     void init() {
         log.debug("Select model has now been initialized")
+        carList = viewdb.listCars(runId)
+        carList.each {
+            carBox.addItem(it)
+        }
     }
 }

@@ -12,7 +12,7 @@ abstract class AbstractDatabase {
     private static final Logger log = LoggerFactory.getLogger(com.spw.rr.AbstractDatabase.class)
 
     SqlSessionFactory sqlSessionFactory = null
-    SqlSession session = null
+    static SqlSession session = null
 
 
     /**

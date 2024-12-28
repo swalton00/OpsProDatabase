@@ -122,6 +122,7 @@ class MainController {
             if (!mm.savedRunComment.isBlank()) {
                 saver.putBaseString("runComment", mm.savedRunComment)
             }
+            db.initialize(mm.savedURL + ";SCHEMA=" + mm.savedSchema, mm.savedUserid, mm.savedPw)
             saver.writeValues()
         }
         mm.checkRun()

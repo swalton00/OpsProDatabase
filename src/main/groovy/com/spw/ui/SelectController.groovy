@@ -48,7 +48,7 @@ class SelectController {
     }
 
     public void init() {
-        sm = new SelectModel()
+        sm = new SelectModel(runId)
         sm.init()
         sv = new SelectView(sm, this, parent)
         sv.init()
