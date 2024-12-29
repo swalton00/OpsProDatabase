@@ -15,4 +15,33 @@
         WHERE
             runid = #{runId}
     </select>
+    <select id="listViewLocs" resultMap="locResult">
+        SELECT
+            l.id as id,
+            xmlid,
+            l.name as name,
+            t.id AS trkId,
+            t.trkId,
+            t.trkname as trknae
+        FROM
+            locations l
+        LEFT OUTER JOIN
+            tracks t
+        ON
+            t.parentid = l.id
+        WHERE
+            l.runid = #{runId}
+            AND t.runid = #{runId}
+        ORDER BY
+            name
+    </select>
+    <resultMap id="locResult" type="com.spw.view.ViewLoc">
+        <id property="id" column="id"/>
+        <result property="xmlId" column="xmlId"/>
+        <result property="name" column="name"/>
+        <collection property="tracks" ofType="com.spw.view.ViewTrack">
+            <id property="id" column="trkId"/>
+            <result property="name" column="trkname"/>
+        </collection>
+    </resultMap>
 </mapper>

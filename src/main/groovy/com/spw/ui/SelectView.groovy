@@ -61,11 +61,12 @@ class SelectView {
 
         ButtonGroup viewGroup = new ButtonGroup()
         viewGroup.add(sm.radioCarByLoc)
+        sm.radioCarByLoc.setName("rbCars")
         JPanel viewPanel = new JPanel(new MigLayout())
-
-        //sm.radioLocByCar.addActionListener(mc.radioAction)
-        sm.radioLocByCar.setSelected(true)
-        //sm.radioCarByLoc.addActionListener(mc.radioAction)
+        sm.radioLocByCar.addActionListener(sc.radioListener)
+        sm.radioCarByLoc.setSelected(true)
+        sm.radioCarByLoc.addActionListener(sc.radioListener)
+        sm.radioLocByCar.setName("rbLocs")
         viewGroup.add(sm.radioLocByCar)
         viewPanel.add(sm.radioCarByLoc)
         viewPanel.add(sm.radioLocByCar)

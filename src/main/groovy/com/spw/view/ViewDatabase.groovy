@@ -1,4 +1,4 @@
-package com.spw.mappers
+package com.spw.view
 
 import com.spw.rr.AbstractDatabase
 import com.spw.view.ViewCar
@@ -18,5 +18,12 @@ class ViewDatabase extends AbstractDatabase {
         List<ViewCar> carList = map.listViewCars(runId)
         log.debug("got a list of ${carList.size()}")
         return carList
+    }
+
+    public List<ViewLoc> listViewLocs(String runId) {
+        ViewInterface map = session.getMapper(ViewInterface.class)
+        List<ViewLoc> locs = map.listViewLocs(runId)
+        log.debug("got a list of ${locs.size()}")
+        return locs
     }
 }

@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory
 
 import javax.swing.JDialog
 import javax.swing.JFrame
+import javax.swing.JRadioButton
+import java.awt.event.ActionEvent
 
 class SelectController {
 
@@ -32,6 +34,23 @@ class SelectController {
         log.debug("creating a Select controller")
         this.runId = runId
         this.parent = parentFrame
+    }
+
+    def radioListener = { ActionEvent e ->
+        if (e.getSource().getClass() == JRadioButton.class) {
+            boolean isCars = false
+            if (e.getSource() == sm.radioCarByLoc) {
+                isCars = true
+            } else {
+                isCars = false
+            }
+            sm.rbCarList.each {
+                it.setEnabled(isCars)
+            }
+            sm.rbLocList.each {
+                it.setEnabled(!isCars)
+            }
+        }
     }
 
     def returnAction  = { ActionEvent ->
