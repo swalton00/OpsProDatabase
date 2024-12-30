@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory
 import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JRadioButton
+import javax.swing.event.ListSelectionEvent
 import java.awt.event.ActionEvent
 import java.awt.event.ItemEvent
 
@@ -68,19 +69,18 @@ class SelectController {
         log.debug("got a view request")
     }
 
-    def selectionAction  = { ItemEvent e ->
+    def selectionAction  = { ListSelectionEvent e ->
         log.trace("Got a selection event on the combo box - ${e}")
-        if (e.getStateChange() == ItemEvent.SELECTED) {
-            // new Location was selected - add associated tracks
-            int selected = sm.locBox.getSelectedIndex()
-            ViewLoc thisItem = sm.locList.getAt(selected)
-            thisItem.tracks.each {
-                sm.trkBox.addItem(it)
-            }
-        } else {
-            // Location item was DEselected - remove all tracks
-            sm.trkBox.removeAllItems()
+        if (e.getValueIsAdjusting()) {
+            // hasn't stabilized yet - skip
+            return
         }
+        List<ViewLoc> selectedList = sm.locBox.getSelectedValuesList()
+        sm.trkBoxModel.removeAllElements()
+        selectedList.each {
+            sm.trkBoxModel.addAll(it.tracks)
+        }
+
     }
 
     public void init() {

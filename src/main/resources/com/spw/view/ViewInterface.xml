@@ -21,8 +21,7 @@
             xmlid,
             l.name as name,
             t.id AS trkId,
-            t.trkId,
-            t.trkname as trknae
+            t.trkname as trkname
         FROM
             locations l
         LEFT OUTER JOIN
@@ -41,7 +40,7 @@
         <result property="name" column="name"/>
         <collection property="tracks" ofType="com.spw.view.ViewTrack">
             <id property="id" column="trkId"/>
-            <result property="name" column="trkname"/>
+            <result property="trackName" column="trkname"/>
         </collection>
     </resultMap>
     <select id="getSequenceNumbers">
