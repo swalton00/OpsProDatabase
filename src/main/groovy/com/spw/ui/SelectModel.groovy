@@ -2,11 +2,15 @@ package com.spw.ui
 
 import com.spw.view.ViewDatabase
 import com.spw.view.ViewCar
+import com.spw.view.ViewLoc
+import com.spw.view.ViewTrack
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import javax.swing.DefaultListModel
 import javax.swing.JButton
 import javax.swing.JComboBox
+import javax.swing.JList
 import javax.swing.JRadioButton
 import java.awt.Component
 
@@ -26,19 +30,20 @@ class SelectModel {
     JRadioButton rbAllCars = new JRadioButton("All cars")
     JRadioButton rbMovedCars = new JRadioButton("Moved")
     JRadioButton rbSpecific = new JRadioButton(("Specific cars"))
-    JComboBox<ViewCar> carBox = new JComboBox<>()
-    List<Component> rbCarList = new ArrayList<>([rbAllCars, rbMovedCars, rbSpecific, carBox])
-    List<ViewCar> carList
+    Vector<ViewCar> carList = new Vector<>()
+    JList<ViewCar> carBox
+    List<Component> rbCarList = new ArrayList<>([rbAllCars, rbMovedCars, rbSpecific])
 
     JRadioButton rbLocsAll = new JRadioButton("All Locations")
     JRadioButton rbLocsWith = new JRadioButton("Locations with Cars")
     JRadioButton rbLocsMoved = new JRadioButton("Cars Moved")
     JRadioButton rbLocsSpecific = new JRadioButton("Specific Locations")
-    String[] locList = []
-    String[] trkList = []
-    JComboBox<String> locBox = new JComboBox<>(locList)
-    JComboBox<String> trkBox = new JComboBox<>(trkList)
-    List<Component> rbLocList = new ArrayList<>([rbLocsAll, rbLocsWith, rbLocsMoved, rbLocsSpecific, locBox, trkBox])
+    Vector<ViewLoc> locList = new Vector()
+    Vector<ViewTrack> trkList = new Vector()
+    JList<ViewLoc> locBox
+    JList<ViewTrack> trkBox
+    DefaultListModel<ViewTrack> trkBoxModel
+    List<Component> rbLocList = new ArrayList<>([rbLocsAll, rbLocsWith, rbLocsMoved, rbLocsSpecific])
 
     JButton buttonReturn = new JButton("Close Dialog")
     JButton buttonExport = new JButton("Export Data")
@@ -46,13 +51,17 @@ class SelectModel {
 
     void init() {
         log.debug("Select model has now been initialized")
-        carList = viewdb.listCars(runId)
-        carList.each {
-            carBox.addItem(it)
-        }
-        locList = viewdb.listViewLocs(runId)
-        locList.each {
-            locBox.addItem(it)
-        }
+        List<ViewCar> retList  = viewdb.listCars(runId)
+        carList.addAll(retList)
+        carBox = new JList<ViewCar>(carList)
+        List<ViewLoc> retLocs = viewdb.listViewLocs(runId)
+        locList.addAll(retLocs)
+        locBox = new JList<ViewLoc>(locList)
+        trkBoxModel = new DefaultListModel<>()
+        trkBox = new JList<>(trkBoxModel)
+        trkBox.setPrototypeCellValue("this is track 1234")
+        rbCarList.add(carBox)
+        rbLocList.add(locBox)
+        rbLocList.add(trkBox)
     }
 }

@@ -2,6 +2,7 @@ package com.spw.ui
 
 import com.spw.rr.DatabaseProcess
 import com.spw.utility.OpDialog
+import com.spw.view.ViewLoc
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -9,6 +10,7 @@ import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JRadioButton
 import java.awt.event.ActionEvent
+import java.awt.event.ItemEvent
 
 class SelectController {
 
@@ -64,6 +66,21 @@ class SelectController {
 
     def viewAction  = { ActionEvent ->
         log.debug("got a view request")
+    }
+
+    def selectionAction  = { ItemEvent e ->
+        log.trace("Got a selection event on the combo box - ${e}")
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            // new Location was selected - add associated tracks
+            int selected = sm.locBox.getSelectedIndex()
+            ViewLoc thisItem = sm.locList.getAt(selected)
+            thisItem.tracks.each {
+                sm.trkBox.addItem(it)
+            }
+        } else {
+            // Location item was DEselected - remove all tracks
+            sm.trkBox.removeAllItems()
+        }
     }
 
     public void init() {

@@ -31,4 +31,10 @@ class ViewDatabaseTest  {
         assertNotNull(results.get(0).tracks)
     }
 
+    @Test
+    void testSequences() {
+        List<Integer> results = db.getSequences('B')
+        assertEquals(8, results.size())
+    }
+
 }

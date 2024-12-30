@@ -26,4 +26,11 @@ class ViewDatabase extends AbstractDatabase {
         log.debug("got a list of ${locs.size()}")
         return locs
     }
+
+    public List<Integer> getSequences(String runId) {
+        ViewInterface map = session.getMapper(ViewInterface.class)
+        List<Integer> results = map.getSequenceNumbers(runId)
+        log.debug("returning a list of sequnce numbers with ${results.size()} entries on it")
+        return results
+    }
 }

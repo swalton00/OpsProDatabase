@@ -44,4 +44,14 @@
             <result property="name" column="trkname"/>
         </collection>
     </resultMap>
+    <select id="getSequenceNumbers">
+        SELECT
+            DISTINCT seq_num
+        FROM
+            run_locs
+        WHERE
+            runId = #{runId}
+        ORDER BY
+            seq_num ASC
+    </select>
 </mapper>
