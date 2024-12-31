@@ -40,4 +40,11 @@ class ViewDatabase extends AbstractDatabase {
         log.debug("got a result set with ${results} rows")
         return results
     }
+
+    public List<RowElement> getRowLocs(String runId) {
+        ViewInterface map = session.getMapper(ViewInterface.class)
+        List<RowElement> results = map.listLocRows(runId)
+        log.debug("the resutts were ${results.size()}")
+        return results
+    }
 }

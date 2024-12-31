@@ -11,5 +11,6 @@ class ViewElement {
     String load
     String runId
     Integer sequenceNumber
+    List<String> carList
 
 }

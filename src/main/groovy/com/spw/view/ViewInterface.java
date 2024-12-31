@@ -9,4 +9,6 @@ public interface ViewInterface {
     public List<ViewTrack> listViewLocs(String runId);
     public List<Integer> getSequenceNumbers(String runId);
     public List<RowElement> listRows(String runId);
+    public List<RowElement> listLocRows(String runId);
+
 }

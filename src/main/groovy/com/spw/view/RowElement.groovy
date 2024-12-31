@@ -6,6 +6,7 @@ class RowElement {
     String roadName
     String roadNumber
     String location
+    String trkId
     String trackName
     List<ViewElement> elements
 }

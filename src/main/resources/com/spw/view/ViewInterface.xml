@@ -96,6 +96,41 @@
             AND t.runId = c.runId
             AND l.runId = c.runId
             AND r.runId = c.runId
-            AND c.carid = 'FGEX38256'
     </select>
+    <select id="listLocRows" resultMap="locResMap">
+        SELECT
+            t.trkId,
+            t.id as idNumber,
+            t.trkName,
+            l.name    AS locName,
+            r.seq_Num AS sequence,
+            r.carid   AS carid
+        FROM
+            tracks AS T
+        INNER JOIN
+            locations AS l
+        ON
+            t.parentid = l.id
+        LEFT OUTER JOIN
+            run_locs AS r
+        ON
+            r.trkid = t.trkid
+        WHERE
+            t.runid = 'B'
+            AND l.runid = t.runid
+            AND (r.runid = t.runid
+                OR r.runid is null)
+    </select>
+    <resultMap id="locResMap" type="RowElement">
+        <id column="idNumber" property="id"/>
+        <result property="trackName" column="trkName"/>
+        <result column="locName" property="location"/>
+        <result column="trkId" property="trkId"/>
+        <collection property="elements" ofType="ViewElement">
+            <id property="sequenceNumber" column="sequence"/>
+            <collection property="carList" javaType="ArrayList">
+                <id column="carid" javaType="String"/>
+            </collection>
+        </collection>
+    </resultMap>
 </mapper>

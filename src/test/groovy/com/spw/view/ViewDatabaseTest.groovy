@@ -56,6 +56,14 @@ class ViewDatabaseTest  {
         List<RowElement> results = db.getRowEleents('B')
         log.debug("results were ${results}")
         assertNotNull(results)
+        assertEquals(8, results.get(0).elements.size())
+    }
+
+    @Test
+    void testRowLocs() {
+        List<RowElement> results = db.getRowLocs('B')
+        log.debug("Results were ${results}")
+        assertEquals(37, results.size())
     }
 
 }
