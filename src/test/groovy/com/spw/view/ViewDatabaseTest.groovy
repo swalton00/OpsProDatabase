@@ -40,6 +40,7 @@ class ViewDatabaseTest  {
         log.debug("res list is ${res}")
         assertNotNull(res.get(0).tracks)
         log.debug("tracks of first is ${res.get(0).tracks.get(0)}")
+        log.debug("tracks is ${res} and first is ${res.get(0)} while the trackes is ${res.get(0).tracks.get(0)}")
         assertNotNull(res.get(0).tracks.get(0))
 
     }
@@ -48,6 +49,13 @@ class ViewDatabaseTest  {
     void testSequences() {
         List<Integer> results = db.getSequences('B')
         assertEquals(8, results.size())
+    }
+
+    @Test
+    void testRowElements() {
+        List<RowElement> results = db.getRowEleents('B')
+        log.debug("results were ${results}")
+        assertNotNull(results)
     }
 
 }

@@ -12,6 +12,8 @@
     <typeAliases>
         <typeAlias type="com.spw.rr.Car" alias="Car"/>
         <typeAlias type="com.spw.rr.Track" alias="Location"/>
+        <typeAlias type="com.spw.view.RowElement" alias="RowElement"/>
+        <typeAlias type="com.spw.view.ViewElement" alias="ViewElement"/>
         <package name="com.spw.mappers"/>
     </typeAliases>
     <environments default="development">

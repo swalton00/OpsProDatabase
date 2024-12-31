@@ -53,4 +53,49 @@
         ORDER BY
             seq_num ASC
     </select>
+    <resultMap id="rowResults" type="RowElement">
+        <id property="id" column="id"/>
+        <result property="roadName" column="roadName"/>
+        <result property="roadNumber" column="roadNumber"/>
+        <collection property="elements" ofType="ViewElement">
+            <id column="rowId" property="id"/>
+            <result column="seq" property="sequenceNumber"/>
+            <result property="trkId" column="trkId"/>
+            <result property="load" column="load"/>
+            <result property="trackName" column="trackName"/>
+            <result property="location" column="location"/>
+        </collection>
+    </resultMap>
+    <select id="listRows" resultMap="rowResults">
+        SELECT
+            c.id as id,
+            roadname,
+            roadnumber,
+            r.id as rowId,
+            r.seq_num as Seq,
+            r.trkid as trkId,
+            r.load as load,
+            t.trkname as trackName,
+            l.name as location
+        FROM
+            cars c
+        INNER JOIN
+            run_locs AS r
+        ON
+            c.carid = r.carid
+        INNER JOIN
+            tracks t
+        ON
+            t.trkid = r.trkid
+        INNER JOIN
+            locations l
+        ON
+            t.parentId = l.id
+        WHERE
+            c.runid = #{runId}
+            AND t.runId = c.runId
+            AND l.runId = c.runId
+            AND r.runId = c.runId
+            AND c.carid = 'FGEX38256'
+    </select>
 </mapper>

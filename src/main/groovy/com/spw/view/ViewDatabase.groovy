@@ -33,4 +33,11 @@ class ViewDatabase extends AbstractDatabase {
         log.debug("returning a list of sequnce numbers with ${results.size()} entries on it")
         return results
     }
+
+    public List<RowElement> getRowEleents(String runId) {
+        ViewInterface map = session.getMapper(ViewInterface.class)
+        List<RowElement> results = map.listRows('B')
+        log.debug("got a result set with ${results} rows")
+        return results
+    }
 }
