@@ -55,14 +55,19 @@ class ViewDatabaseTest  {
     void testRowElements() {
         List<RowElement> results = db.getRowEleents('B')
         log.debug("results were ${results}")
+        log.debug("first element was ${results.get(0)}")
         assertNotNull(results)
+        String toStrigValue = results.get(0).elements.get(0).toString()
+        log.debug("first row is ${results.get(0).elements.get(0)}")
         assertEquals(8, results.get(0).elements.size())
     }
 
     @Test
     void testRowLocs() {
         List<RowElement> results = db.getRowLocs('B')
-        log.debug("Results were ${results}")
+        ViewElement.setType(ViewElement.RunType.TRACK, true, true)
+       // log.debug("Results were ${results}")
+        log.debug("first row is ${results.get(0).elements.get(0)}")
         assertEquals(37, results.size())
     }
 

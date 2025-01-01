@@ -104,6 +104,7 @@
             t.trkName,
             l.name    AS locName,
             r.seq_Num AS sequence,
+            r.load as load,
             r.carid   AS carid
         FROM
             tracks AS T
@@ -120,6 +121,7 @@
             AND l.runid = t.runid
             AND (r.runid = t.runid
                 OR r.runid is null)
+<!--        AND t.trkId = '10s1'-->
     </select>
     <resultMap id="locResMap" type="RowElement">
         <id column="idNumber" property="id"/>
@@ -128,8 +130,9 @@
         <result column="trkId" property="trkId"/>
         <collection property="elements" ofType="ViewElement">
             <id property="sequenceNumber" column="sequence"/>
-            <collection property="carList" javaType="ArrayList">
-                <id column="carid" javaType="String"/>
+            <collection property="carList" ofType="InnerCar">
+                <id column="carid" property="carId"/>
+                <result column="load" property="load"/>
             </collection>
         </collection>
     </resultMap>
