@@ -2,6 +2,7 @@ package com.spw.ui
 
 import com.spw.view.ViewDatabase
 import com.spw.view.ViewCar
+import com.spw.view.ViewElement
 import com.spw.view.ViewLoc
 import com.spw.view.ViewTrack
 import org.slf4j.Logger
@@ -39,7 +40,6 @@ class SelectModel {
     JRadioButton rbLocsMoved = new JRadioButton("Cars Moved")
     JRadioButton rbLocsSpecific = new JRadioButton("Specific Locations")
     Vector<ViewLoc> locList = new Vector()
-    Vector<ViewTrack> trkList = new Vector()
     JList<ViewLoc> locBox
     JList<ViewTrack> trkBox
     DefaultListModel<ViewTrack> trkBoxModel
@@ -48,6 +48,10 @@ class SelectModel {
     JButton buttonReturn = new JButton("Close Dialog")
     JButton buttonExport = new JButton("Export Data")
     JButton buttonView = new JButton("View Data")
+
+    // non-ui versions of the selection data
+
+
 
     void init() {
         log.debug("Select model has now been initialized")
