@@ -55,6 +55,7 @@
     </select>
     <resultMap id="rowResults" type="RowElement">
         <id property="id" column="id"/>
+        <result property="carId" column="carId"/>
         <result property="roadName" column="roadName"/>
         <result property="roadNumber" column="roadNumber"/>
         <collection property="elements" ofType="ViewElement">
@@ -69,6 +70,7 @@
     <select id="listRows" resultMap="rowResults">
         SELECT
             c.id as id,
+            c.carid as carId,
             roadname,
             roadnumber,
             r.id as rowId,

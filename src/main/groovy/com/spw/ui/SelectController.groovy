@@ -83,9 +83,11 @@ class SelectController {
         List<Integer> seqs = vdb.getSequences(runId)
         List<RowElement> rowData
         if (parameters.runType.equals(ViewElement.RunType.CAR)) {
+            ViewElement.setType(ViewElement.RunType.CAR, true, true)
             tableController.model.columnHeader.add("Car Number")
             rowData = vdb.getRowEleents(runId)
         } else {
+            ViewElement.setType(ViewElement.RunType.TRACK, true, true)
             tableController.model.columnHeader.add("Track Name")
             rowData = vdb.getRowLocs(runId)
         }
@@ -120,7 +122,7 @@ class SelectController {
         // create the viewTable classes and pass control
         parameters = new ViewParameter()
         parameters.runId = runId
-        if (sm.radioLocByCar.isSelected()) {
+        if (sm.radioCarByLoc.isSelected()) {
             parameters.runType = ViewElement.RunType.CAR
             if (sm.rbAllCars.isSelected()) {
                 parameters.carSelect = ViewParameter.CarSelect.ALL

@@ -10,6 +10,7 @@ import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.JScrollPane
 import javax.swing.JTable
+import java.awt.BorderLayout
 import java.awt.event.KeyEvent
 
 class ViewTableView {
@@ -25,7 +26,7 @@ class ViewTableView {
     public void init() {
         thisDialog = new OpDialog(parent, "Car Movement Data", true)
         thisDialog.setName("table")
-        thisDialog.setLayout(new MigLayout())
+        thisDialog.setLayout(new BorderLayout())
         Integer dialogWidth = saver.getInt("table", thisDialog.getWidthName())
         if (dialogWidth == null) {
             dialogWidth = 1000
@@ -40,15 +41,17 @@ class ViewTableView {
 
         JMenuBar menuBar = new JMenuBar()
         JMenu fileMenu = new JMenu("File")
-        menuBar.add(fileMenu)
+        menuBar.add(fileMenu, "wrap")
         JMenuItem fileClose = new JMenuItem("Close", KeyEvent.VK_C)
         menuBar.add(fileClose)
         fileClose.addActionListener(controller.closeAction)
-        thisDialog.getContentPane().add(menuBar)
+        thisDialog.getContentPane().add(menuBar, BorderLayout.NORTH)
 
         theTable = new JTable(model.dataForTable, model.columnHeader)
+        theTable.setRowHeight(75)
+        theTable.setFillsViewportHeight(true)
         JScrollPane tableScroll = new JScrollPane(theTable)
-        thisDialog.add(tableScroll)
+        thisDialog.add(tableScroll, BorderLayout.CENTER)
         thisDialog.pack()
         thisDialog.setVisible(true)
     }
