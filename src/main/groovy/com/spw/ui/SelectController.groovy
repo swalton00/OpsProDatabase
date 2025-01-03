@@ -96,16 +96,12 @@ class SelectController {
         }
         tableController.model.dataForTable = new Vector<>()
         rowData.each {row ->
-            Vector<String> currentRow = new Vector<>()
-            if (parameters.runType.equals(ViewElement.RunType.CAR)) {
-                currentRow.add(row.carId)
-            } else {
-                currentRow.add(row.trackName)
-            }
+            Vector<Object> currentRow = new Vector<>()
+            currentRow.add(row)
             seqs.each {seq ->
                 row.elements.each {element ->
                     if (element.sequenceNumber.equals(seq)) {
-                        currentRow.add(element.toString())
+                        currentRow.add(element)
                     }
                 }
             }

@@ -50,6 +50,8 @@ class ViewTableView {
         theTable = new JTable(model.dataForTable, model.columnHeader)
         theTable.setRowHeight(75)
         theTable.setFillsViewportHeight(true)
+        ViewCellRenderer renderer = new ViewCellRenderer()
+        theTable.setDefaultRenderer(Object.class, renderer)
         JScrollPane tableScroll = new JScrollPane(theTable)
         thisDialog.add(tableScroll, BorderLayout.CENTER)
         thisDialog.pack()

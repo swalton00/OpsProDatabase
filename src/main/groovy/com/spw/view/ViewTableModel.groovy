@@ -9,7 +9,7 @@ class ViewTableModel {
     Logger log = LoggerFactory.getLogger(ViewTableModel.class)
     Vector<String> columnHeader
     ViewParameter modelParameter
-    Vector<Vector<String>> dataForTable
+    Vector<Vector<Object>> dataForTable
 
     public void init() {
 

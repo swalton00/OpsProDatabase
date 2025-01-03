@@ -1,3 +1,8 @@
+Bugs to fix
+    1. save size and location of ViewTable and restore on start up
+    2. compute width of columns and set preferred size of each
+    3. compute max size of each row and set rowHeight of each
+
 1. Add a Properties service
     a. save properties file in user home location
     b. with add, get and save methods
