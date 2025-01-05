@@ -34,16 +34,16 @@ class ViewDatabase extends AbstractDatabase {
         return results
     }
 
-    public List<RowElement> getRowEleents(String runId) {
+    public List<RowElement> getRowEleents(ViewParameter parameters) {
         ViewInterface map = session.getMapper(ViewInterface.class)
-        List<RowElement> results = map.listRows('B')
+        List<RowElement> results = map.listRows(parameters)
         log.debug("got a result set with ${results} rows")
         return results
     }
 
-    public List<RowElement> getRowLocs(String runId) {
+    public List<RowElement> getRowLocs(ViewParameter parameter) {
         ViewInterface map = session.getMapper(ViewInterface.class)
-        List<RowElement> results = map.listLocRows(runId)
+        List<RowElement> results = map.listLocRows(parameter)
         log.debug("the resutts were ${results.size()}")
         return results
     }

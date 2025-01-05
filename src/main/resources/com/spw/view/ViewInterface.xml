@@ -110,7 +110,7 @@
             r.carid   AS carid
         FROM
             tracks AS T
-        INNER JOIN
+        LEFT OUTER JOIN
             locations AS l
         ON
             t.parentid = l.id
@@ -118,12 +118,18 @@
             run_locs AS r
         ON
             r.trkid = t.trkid
+        LEFT OUTER JOIN
+            cars c
+        ON
+            c.carid = r.carid
         WHERE
-            t.runid = 'B'
+            t.runid = #{runId}
             AND l.runid = t.runid
             AND (r.runid = t.runid
                 OR r.runid is null)
-<!--        AND t.trkId = '10s1'-->
+        <if test="locSelect.name() == 'WITH'">
+            AND r.runid is NOT NULL
+        </if>
     </select>
     <resultMap id="locResMap" type="RowElement">
         <id column="idNumber" property="id"/>

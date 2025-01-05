@@ -8,7 +8,7 @@ public interface ViewInterface {
     public List<ViewCar> listViewCars(String runId) ;
     public List<ViewTrack> listViewLocs(String runId);
     public List<Integer> getSequenceNumbers(String runId);
-    public List<RowElement> listRows(String runId);
-    public List<RowElement> listLocRows(String runId);
+    public List<RowElement> listRows(ViewParameter parameter);
+    public List<RowElement> listLocRows(ViewParameter parameter);
 
 }

@@ -85,11 +85,11 @@ class SelectController {
         if (parameters.runType.equals(ViewElement.RunType.CAR)) {
             ViewElement.setType(ViewElement.RunType.CAR, true, true)
             tableController.model.columnHeader.add("Car Number")
-            rowData = vdb.getRowEleents(runId)
+            rowData = vdb.getRowEleents(parameters)
         } else {
             ViewElement.setType(ViewElement.RunType.TRACK, true, true)
             tableController.model.columnHeader.add("Track Name")
-            rowData = vdb.getRowLocs(runId)
+            rowData = vdb.getRowLocs(parameters)
         }
         seqs.each {
             tableController.model.columnHeader.add(it.toString())
