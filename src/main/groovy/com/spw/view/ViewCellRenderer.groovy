@@ -6,8 +6,20 @@ import javax.swing.table.TableCellRenderer
 import java.awt.Component
 
 class ViewCellRenderer extends JList<String[]> implements TableCellRenderer {
-    @Override
-    Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+    public getCellMaxes(ArrayList<Integer> widths, ArrayList<Integer> heights, Object value, int indWidth, int inHdeight) {
+        String[] testString = getCellStrings(value)
+        int maxHeight = heights.get(inHdeight)
+        maxHeight = testString.size() > maxHeight ? testString.size() : maxHeight
+        heights.set(inHdeight, maxHeight)
+        int maxWidth = widths.get(indWidth)
+        testString.each {
+            maxWidth = it.size() > maxWidth ? it.size() : maxWidth
+        }
+        widths.set(indWidth, maxWidth)
+    }
+
+    private String[] getCellStrings(Object value) {
         String[] resultValue
         if (value instanceof RowElement) {
             resultValue = new String[2]
@@ -34,6 +46,18 @@ class ViewCellRenderer extends JList<String[]> implements TableCellRenderer {
             resultValue = new String[1]
             resultValue[0] = " "
         }
+        return resultValue
+    }
+
+    @Override
+    Component getTableCellRendererComponent(JTable table,
+                                            Object value,
+                                            boolean isSelected,
+                                            boolean hasFocus,
+                                            int row,
+                                            int column) {
+        String[] resultValue = getCellStrings(value)
+
         setListData((String[]) resultValue)
         return this
     }
