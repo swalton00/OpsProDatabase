@@ -134,7 +134,7 @@ class ViewTableView {
             dialogHeight = 1200
             saver.saveInt("table", thisDialog.getHeightName(), dialogHeight)
         }
-        thisDialog.setSize(dialogWidth, dialogHeight)
+        thisDialog.setPreferredSize(new Dimension(dialogWidth, dialogHeight))
         thisDialog.setLocation(locx, locy)
         thisDialog.pack()
         thisDialog.setVisible(true)
