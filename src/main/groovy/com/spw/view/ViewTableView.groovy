@@ -78,14 +78,14 @@ class ViewTableView {
         }
         cellMaxes(rowWidths, rowHeights, isCar, model.dataForTable, tab)
         TableColumnModel columnModel = tab.getColumnModel()
-        log.trace("column width multiplier is ${WIDTH_MULTIPLIER}")
+   //     log.trace("column width multiplier is ${WIDTH_MULTIPLIER}")
         for (i in 0..<model.columnHeader.size()) {
-            log.trace("column width for column ${i} is ${rowWidths.getAt(i)}")
+       //     log.trace("column width for column ${i} is ${rowWidths.getAt(i)}")
             columnModel.getColumn(i).setPreferredWidth((rowWidths.get(i)*WIDTH_MULTIPLIER))
         }
-        log.trace("row heigth multiplier is ${HEIGHT_MULTIPLIER}")
+     //   log.trace("row heigth multiplier is ${HEIGHT_MULTIPLIER}")
         for (i in 0..<model.dataForTable.size()) {
-            log.trace("row height for row ${i} is ${rowHeights.get(i)}")
+     //       log.trace("row height for row ${i} is ${rowHeights.get(i)}")
             tab.setRowHeight(i, (rowHeights.get(i) * HEIGHT_MULTIPLIER))
         }
         // put cell maxes here

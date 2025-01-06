@@ -8,6 +8,13 @@ public class ViewLoc {
     Integer id;
     String xmlId;
     String name;
+    public String getTrkId() {
+        return trkId;
+    }
+    public void setTrkId(String trkId) {
+        this.trkId = trkId;
+    }
+    String trkId;
     List<ViewTrack> tracks = new ArrayList<>();
     public List<ViewTrack> getTracks() {
         return tracks;

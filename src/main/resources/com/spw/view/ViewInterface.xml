@@ -21,6 +21,7 @@
             xmlid,
             l.name as name,
             t.id AS trkId,
+            t.trkid as thisId,
             t.trkname as trkname
         FROM
             locations l
@@ -40,6 +41,7 @@
         <result property="name" column="name"/>
         <collection property="tracks" ofType="com.spw.view.ViewTrack">
             <id property="id" column="trkId"/>
+            <result property="trkId" column="thisId"/>
             <result property="trackName" column="trkname"/>
         </collection>
     </resultMap>
@@ -130,6 +132,16 @@
         <if test="locSelect.name() == 'WITH'">
             AND r.runid is NOT NULL
         </if>
+        <if test="locSelect.name() == 'MOVED'">
+            <include refid="carsMoved"/>
+        </if>
+        <if test="locSelect.name() == 'SPECIFIC'">
+            AND
+            <foreach collection="idList" item="item" separator=", " open="t.trkid in ( " close=" )">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY locname, trkname
     </select>
     <resultMap id="locResMap" type="RowElement">
         <id column="idNumber" property="id"/>
@@ -144,4 +156,18 @@
             </collection>
         </collection>
     </resultMap>
+    <sql id="carsMoved">
+        AND EXISTS
+        (   SELECT
+            *
+        FROM
+            run_locs r1
+        INNER JOIN
+            run_locs r2
+        ON
+            r1.runid = r2.runid
+            AND r1.carid = r2.carid
+            AND r.carid = r1.carid
+            AND NOT ( r1.trkid = r2.trkid ))
+    </sql>
 </mapper>

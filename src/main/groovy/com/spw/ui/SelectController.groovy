@@ -36,11 +36,8 @@ class SelectController {
 
     /**
      * Create a new Select Controller to setup for viewing data
-     * @param userid the userid for db access
-     * @param password the password for that user
-     * @param url the URL for the database
-     * @param schema the schema to add to the url
-     * @param parentFrame the dparent of this frame
+     * @param runId     the identifier in the database for this data
+     * @param parentFrame the parent of this frame
      */
     SelectController(String runId, OpDialog parentFrame) {
         log.debug("creating a Select controller")
@@ -142,11 +139,11 @@ class SelectController {
                 parameters.locSelect = ViewParameter.LocSelect.WITH
             } else if (sm.rbLocsMoved.isSelected()) {
                 parameters.locSelect = ViewParameter.LocSelect.MOVED
-            } else if (sm.rbLocsSpecific.isSelected) {
+            } else if (sm.rbLocsSpecific.isSelected()) {
                 parameters.locSelect = ViewParameter.LocSelect.SPECIFIC
                 parameters.idList = new ArrayList<>()
                 boolean onlyLocs = false
-                if (sm.trkBox.getMinSelectionIndex() == -1) {
+                if (sm.trkBox.isSelectionEmpty()) {
                     // no tracks selected - use all from location
                     List<ViewLoc> selLocs = sm.locBox.getSelectedValuesList()
                     selLocs.each { loc ->
@@ -154,10 +151,10 @@ class SelectController {
                             parameters.idList.add(trk.trkId)
                         }
                     }
-
                 } else {
                     // use only selected tracks
-                    List<ViewTrack> trks = sm.trkBox.each {
+                    List<ViewTrack> trks = sm.trkBox.getSelectedValuesList()
+                    trks.each {
                         parameters.idList.add(it.trkId)
                     }
                 }
