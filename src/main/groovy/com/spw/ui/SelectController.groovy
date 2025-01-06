@@ -1,6 +1,6 @@
 package com.spw.ui
 
-import com.spw.rr.DatabaseProcess
+
 import com.spw.utility.OpDialog
 import com.spw.utility.RunTasks
 import com.spw.view.RowElement
@@ -82,7 +82,7 @@ class SelectController {
         if (parameters.runType.equals(ViewElement.RunType.CAR)) {
             ViewElement.setType(ViewElement.RunType.CAR, true, true)
             tableController.model.columnHeader.add("Car Number")
-            rowData = vdb.getRowEleents(parameters)
+            rowData = vdb.getRowElements(parameters)
         } else {
             ViewElement.setType(ViewElement.RunType.TRACK, true, true)
             tableController.model.columnHeader.add("Track Name")

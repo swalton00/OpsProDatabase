@@ -53,7 +53,7 @@ class ViewDatabaseTest  {
 
     @Test
     void testRowElements() {
-        List<RowElement> results = db.getRowEleents('B')
+        List<RowElement> results = db.getRowElements('B')
         log.debug("results were ${results}")
         log.debug("first element was ${results.get(0)}")
         assertNotNull(results)

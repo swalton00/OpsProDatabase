@@ -34,7 +34,7 @@ class ViewDatabase extends AbstractDatabase {
         return results
     }
 
-    public List<RowElement> getRowEleents(ViewParameter parameters) {
+    public List<RowElement> getRowElements(ViewParameter parameters) {
         ViewInterface map = session.getMapper(ViewInterface.class)
         List<RowElement> results = map.listRows(parameters)
         log.debug("got a result set with ${results} rows")

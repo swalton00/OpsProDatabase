@@ -99,9 +99,8 @@ class SelectView {
         JScrollPane carBoxPane = new JScrollPane(sm.carBox)
         sm.carBox.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         sm.carBox.setLayoutOrientation(JList.VERTICAL)
-        sm.carBox.setVisibleRowCount(5)
-        sm.carBox.setPreferredSize(new Dimension(50, 75))
-        carBoxPane.setPreferredSize(new Dimension(100, 75))
+        sm.carBox.setVisibleRowCount(10)
+        carBoxPane.setPreferredSize(new Dimension(150, 90))
         carsPanel.add(carBoxPane, "wrap")
         sm.rbAllCars.setSelected(true)
 

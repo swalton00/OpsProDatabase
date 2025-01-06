@@ -100,6 +100,18 @@
             AND t.runId = c.runId
             AND l.runId = c.runId
             AND r.runId = c.runId
+        <if test="carSelect.name() == 'MOVED'">
+            <include refid="carsMoved"/>
+        </if>
+        <if test="carSelect.name() == 'SPECIFIC'">
+            AND
+            <foreach collection="idList" item="item" separator=", " open="c.carid in ( " close=" )">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY
+            roadname,
+            roadnumber
     </select>
     <select id="listLocRows" resultMap="locResMap">
         SELECT
