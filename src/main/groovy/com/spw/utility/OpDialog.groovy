@@ -9,9 +9,7 @@ import java.awt.Point
 import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
 
-class OpDialog extends JDialog implements ComponentListener{
-    private static final Logger log = LoggerFactory.getLogger(OpDialog.class)
-    private static final PropertySaver saver = PropertySaver.getInstance()
+class OpDialog extends JDialog {
     private static final String NAME_HEIGHT = "sizeHeight"
     private static final String NAME_WIDTH = "sizeWidth"
     private static final String NAME_X = "x"
@@ -19,8 +17,8 @@ class OpDialog extends JDialog implements ComponentListener{
 
     OpDialog(java.awt.Dialog parent, String title, boolean modal) {
         super(parent, title, modal)
-        log.debug("in the extended constructor - parent is ${parent}")
-        this.addComponentListener(this)
+        FrameHelper helper = new FrameHelper()
+        this.addComponentListener(helper)
     }
 
     OpDialog() {
@@ -28,48 +26,20 @@ class OpDialog extends JDialog implements ComponentListener{
     }
 
 
-    String getXname() {
+    public static String getXname() {
         return NAME_X
     }
 
-    String getYname() {
+    public static String getYname() {
         return NAME_Y
     }
 
-    String getWidthName() {
+    public static String getWidthName() {
         return NAME_WIDTH
     }
 
-    String getHeightName() {
+    public static String getHeightName() {
         return NAME_HEIGHT
     }
 
-
-    @Override
-    void componentResized(ComponentEvent e) {
-        String name = e.getComponent().getName()
-        log.trace("component resized event for ${name}")
-        Dimension dim = e.getComponent().getSize()
-        saver.saveInt(name, NAME_WIDTH, (int)dim.getWidth())
-        saver.saveInt(name, NAME_HEIGHT, (int)dim.getHeight())
-    }
-
-    @Override
-    void componentMoved(ComponentEvent e) {
-        String name = e.getComponent().getName()
-        log.trace("component moved event for ${name}")
-        Point p = e.getComponent().getLocation()
-        saver.saveInt(name, NAME_X, (int) p.getX())
-        saver.saveInt(name, NAME_Y, (int) p.getY())
-    }
-
-    @Override
-    void componentShown(ComponentEvent e) {
-        return
-    }
-
-    @Override
-    void componentHidden(ComponentEvent e) {
-        return
-    }
 }
