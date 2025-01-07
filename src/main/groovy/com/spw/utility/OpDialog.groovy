@@ -15,7 +15,7 @@ class OpDialog extends JDialog {
     private static final String NAME_X = "x"
     private static final String NAME_Y = "y"
 
-    OpDialog(java.awt.Dialog parent, String title, boolean modal) {
+    OpDialog(java.awt.Window parent, String title, boolean modal) {
         super(parent, title, modal)
         FrameHelper helper = new FrameHelper()
         this.addComponentListener(helper)

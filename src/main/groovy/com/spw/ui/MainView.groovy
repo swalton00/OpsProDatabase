@@ -1,28 +1,20 @@
 package com.spw.ui
 
+import com.spw.utility.FrameHelper
 import com.spw.utility.Message
 import com.spw.utility.OpDialog
 import com.spw.utility.PropertySaver
+import net.miginfocom.swing.MigLayout
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import javax.swing.ButtonGroup
-import javax.swing.JDialog
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JSeparator
-import javax.swing.SwingConstants
-import javax.swing.SwingUtilities
-import javax.swing.WindowConstants
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.Font
-import java.awt.Toolkit
-import net.miginfocom.swing.MigLayout;
+
+import javax.swing.*
+import java.awt.*
 
 class MainView {
     MainController mc
     MainModel mm
-    JDialog mainDialog
+    JFrame mainFrame
 
 
     private static final Logger log = LoggerFactory.getLogger(MainView.class)
@@ -44,24 +36,24 @@ class MainView {
     }
 
     public void start() {
-        OpDialog base = new OpDialog()
-        mainDialog = base
-        base.getContentPane().setLayout(new MigLayout("fillx"))
-        base.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-        base.setTitle("Ops Progress Main")
-        Integer frameWidth = saver.getInt("main", base.getWidthName())
+        mainFrame = new JFrame()
+        mainFrame.addComponentListener(new FrameHelper())
+        mainFrame.getContentPane().setLayout(new MigLayout("fillx"))
+        mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
+        mainFrame.setTitle("Ops Progress Main")
+        Integer frameWidth = saver.getInt("main", OpDialog.getWidthName())
         if (frameWidth == null) {
             frameWidth = 250
-            saver.saveInt("main", base.getWidthName(), 250)
+            saver.saveInt("main", OpDialog.getWidthName(), 250)
         }
-        Integer frameHeight = saver.getInt("main", base.getHeightName())
+        Integer frameHeight = saver.getInt("main", OpDialog.getHeightName())
         if (frameHeight == null) {
             frameHeight = 400
-            saver.saveInt("main", base.getHeightName(), 400)
+            saver.saveInt("main", OpDialog.getHeightName(), 400)
         }
-        base.setSize(frameWidth, frameHeight)
-        base.getContentPane().setSize(250, 400)
-        base.setName("main")
+        mainFrame.setSize(frameWidth, frameHeight)
+        mainFrame.getContentPane().setSize(250, 400)
+        mainFrame.setName("main")
         JLabel appTitle = new JLabel("Ops Progress")
         makeLarger(appTitle, 36)
         JPanel titlePanel = new JPanel(new MigLayout("center"))
@@ -69,7 +61,7 @@ class MainView {
         JLabel labelDBValues = new JLabel("Database Values")
         makeLarger(labelDBValues)
         titlePanel.add(labelDBValues, "center")
-        base.getContentPane().add(titlePanel, "center, wrap")
+        mainFrame.getContentPane().add(titlePanel, "center, wrap")
         JLabel labelUserid = new JLabel(("Userid:"))
         JPanel contentPanel = new JPanel()
         contentPanel.setLayout(new MigLayout())
@@ -150,11 +142,11 @@ class MainView {
         mm.buttonView.setEnabled(false)
         contentPanel.add(mm.buttonView, "center, wrap")
         mm.exitButton.addActionListener(mc.buttonExitAction)
-        base.getContentPane().add(contentPanel, "center, span 2,wrap")
+        mainFrame.getContentPane().add(contentPanel, "center, span 2,wrap")
 
         JSeparator sep3 = new JSeparator()
         sep3.setPreferredSize(new Dimension(100, 15))
-        base.getContentPane().add(sep3, "center, span 2, wrap")
+        mainFrame.getContentPane().add(sep3, "center, span 2, wrap")
         JPanel finalPanel = new JPanel(new MigLayout("gapx 5cm"))
         finalPanel.add(mm.exitButton)
         mm.buttonOpsHome.addActionListener(mc.selectHomeAction)
@@ -168,29 +160,29 @@ class MainView {
         mm.messagePanel.setPreferredSize(new Dimension(600, 20))
         mm.message.messageLabel.setColumns(400)
         mm.messagePanel.add(mm.message.messageLabel, "grow 200, wrap")
-        base.getContentPane().add(finalPanel, "center, span 2, wrap")
-        base.getContentPane().add(mm.messagePanel, "span 2, wrap")
+        mainFrame.getContentPane().add(finalPanel, "center, span 2, wrap")
+        mainFrame.getContentPane().add(mm.messagePanel, "span 2, wrap")
 
         // now ready to display
-        base.pack()
-        frameWidth = base.getWidth()
-        frameHeight = base.getHeight()
+        mainFrame.pack()
+        frameWidth = mainFrame.getWidth()
+        frameHeight = mainFrame.getHeight()
         Toolkit toolkit = Toolkit.getDefaultToolkit()
         int screenWidth = toolkit.getScreenSize().width
         int screenHeight = toolkit.getScreenSize().height
-        Integer frameLocX = saver.getInt("main", base.getXname())
-        Integer frameLocY = saver.getInt("main", base.getYname())
+        Integer frameLocX = saver.getInt("main", OpDialog.getXname())
+        Integer frameLocY = saver.getInt("main", OpDialog.getYname())
         if (frameLocX == null) {
             frameLocX = (screenWidth - frameWidth) / 2
             frameLocY = (screenHeight - frameHeight) / 2
-            saver.saveInt("main", base.getXname(), frameLocX)
-            saver.saveInt("main", base.getYname(), frameLocY)
+            saver.saveInt("main", OpDialog.getXname(), frameLocX)
+            saver.saveInt("main", OpDialog.getYname(), frameLocY)
         }
-        base.setLocation(frameLocX, frameLocY)
+        mainFrame.setLocation(frameLocX, frameLocY)
         mm.readyToCheck = true
         mm.currentStage = MainModel.ProcessStage.CHECKING
         mm.checkFields()
-        base.setVisible(true)
+        mainFrame.setVisible(true)
     }
 
     private void edtUpdate(Message theMessage) {

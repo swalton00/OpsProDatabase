@@ -88,7 +88,7 @@ class MainController {
 
     Runnable createSelectTask  = () -> {
         log.debug("creating the Select elements")
-        SelectController sc = new SelectController(mm.savedRunId, mv.mainDialog)
+        SelectController sc = new SelectController(mm.savedRunId, mv.mainFrame)
         sc.init()
     }
 

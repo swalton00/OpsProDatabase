@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory
 import javax.swing.JDialog
 import javax.swing.JRadioButton
 import javax.swing.event.ListSelectionEvent
+import java.awt.Window
 import java.awt.event.ActionEvent
 
 class SelectController {
@@ -29,7 +30,7 @@ class SelectController {
 
     SelectView sv
     SelectModel sm
-    JDialog parent
+    Window parent
     ViewParameter parameters
     RunTasks runner = RunTasks.getInstance()
     ViewTableController tableController
@@ -39,7 +40,7 @@ class SelectController {
      * @param runId     the identifier in the database for this data
      * @param parentFrame the parent of this frame
      */
-    SelectController(String runId, OpDialog parentFrame) {
+    SelectController(String runId, Window parentFrame) {
         log.debug("creating a Select controller")
         this.runId = runId
         this.parent = parentFrame

@@ -25,7 +25,8 @@ import javax.swing.ListSelectionModel
 import javax.swing.border.Border
 import java.awt.Dialog
 import java.awt.Dimension
-import java.awt.Toolkit;
+import java.awt.Toolkit
+import java.awt.Window;
 
 class SelectView {
 
@@ -36,8 +37,8 @@ class SelectView {
 
     PropertySaver saver = PropertySaver.getInstance()
 
-    JDialog viewDialog
-    Dialog parent
+    Window viewDialog
+    Window parent
 
 
     /**
@@ -46,7 +47,7 @@ class SelectView {
      * @param selectController  the controller to handle all the actions
      * @param parent            the parent frome (to make it modal)
      */
-    SelectView(SelectModel selectModel, SelectController selectController, JDialog parent) {
+    SelectView(SelectModel selectModel, SelectController selectController, Window parent) {
         this.sm = selectModel
         this.sc = selectController
         this.parent = parent
