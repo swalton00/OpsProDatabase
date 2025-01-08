@@ -1,3 +1,4 @@
+set schema = parser;
 CREATE TABLE
     IF NOT EXISTS locations
     (
@@ -20,7 +21,7 @@ CREATE TABLE
         trkLength   VARCHAR(32),
         runId       VARCHAR(16),
         UNIQUE (runId, trkId),
-        FOREIGN KEY (parentId) REFERENCES locations
+        FOREIGN KEY (runid, parentId) REFERENCES locations (runid, id)
     );
 CREATE TABLE
     IF NOT EXISTS cars
@@ -57,11 +58,11 @@ CREATE TABLE
         FOREIGN KEY ( runid ) REFERENCES runIds ( runId ) ON
 DELETE
     NO ACTION ,
-    FOREIGN KEY(trkId) REFERENCES tracks(trkId)
+    FOREIGN KEY(runid, trkId) REFERENCES tracks(runid, trkId)
 ON
 DELETE
     NO ACTION,
-    FOREIGN KEY(carId) REFERENCES cars(carId)
+    FOREIGN KEY(runid, carId) REFERENCES cars(runid, carId)
 ON
 DELETE
     NO ACTION

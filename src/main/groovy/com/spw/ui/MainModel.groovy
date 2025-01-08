@@ -45,7 +45,6 @@ class MainModel implements FocusListener {
     boolean validPassword = false
     boolean validSchema = false
     boolean validURL = false
-    boolean validRunid = false
 
     Integer nextSequence = 0
     String savedUserid
@@ -179,6 +178,10 @@ class MainModel implements FocusListener {
 
     }
 
+    /**
+     * must be called in the background thread
+     * read the count of sequences
+     */
     Runnable getSequence = () ->  {
         if (SwingUtilities.isEventDispatchThread()) {
             log.error("getSequence called from UI thread!")
@@ -191,6 +194,8 @@ class MainModel implements FocusListener {
         if (seqCount > 0) {
             log.debug("sequence count is > 0 (${seqCount} - enabling views")
             viewReady = true
+        } else {
+            viewReady = false
         }
         SwingUtilities.invokeLater { ->
             currentSequence.setText(Integer.toString(nextSequence))
@@ -321,10 +326,14 @@ class MainModel implements FocusListener {
             valueChanged = false
         }
         if (currentStage.equals(ProcessStage.CHECKING)) {
+            log.debug("focus lost and current stage is ${currentStage} value should be ${ProcessStage.CHECKING}")
             innerCheckFields()
-        } else if (currentStage.equals(ProcessStage.RUN_READY)) {
+        } else if (currentStage.equals(ProcessStage.COLLECTING) | currentStage.equals(ProcessStage.RUN_READY)) {
+            log.debug("current stage is RUN_READY and got focus lost")
             if (e.getComponent().getName().equals("runid")) {
-                checkRun()
+                if (!newValue.equals(priorValue)) {
+                    checkRun()
+                }
             }
         }
     }

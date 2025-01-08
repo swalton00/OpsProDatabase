@@ -12,7 +12,7 @@ class OpsReader {
     static final String LOCATIONS_FILE = 'OperationsLocationRoster.xml'
 
 
-    void processFiles(String dataHome) {
+    void processFiles(String dataHome, String runId ) {
         log.debug("setting up to process - home is ${dataHome}")
         ParseFile parsedlocations = new ParseFile(dataHome, LOCATIONS_FILE)
         ParseFile parsedCars = new ParseFile(dataHome, CAR_FILE)
@@ -21,8 +21,8 @@ class OpsReader {
         try {
             Integer currentSequence = db.getCurrentSequence()
             /* need to do locations first since runLocs will reference Locations */
-            ProcessData.doLocations(locs.getLocations(), locs.getTracks())
-            ProcessData.doCars(cars.getCarList())
+            ProcessData.doLocations(locs.getLocations(), locs.getTracks(), runId)
+            ProcessData.doCars(cars.getCarList(), runId)
         } catch (Exception e) {
             log.error("exception in processing", e)
         }
@@ -34,7 +34,7 @@ class OpsReader {
     void staticSetup() {
         db.initialize(VarData.dbUrl, VarData.dbUserid, VarData.dbPw)
         db.setRunId(VarData.runId, VarData.runComment)
-        processFiles(VarData.dataHome)
+        processFiles(VarData.dataHome, VarData.runId)
     }
 
     static void main(String[] args) {

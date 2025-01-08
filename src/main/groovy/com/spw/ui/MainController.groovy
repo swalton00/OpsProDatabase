@@ -77,7 +77,7 @@ class MainController {
         db.initialize( mm.savedURL + ";SCHEMA=" + mm.savedSchema, mm.savedUserid, mm.savedPw)
         db.setRunId(mm.savedRunId, mm.savedRunComment)
         OpsReader ops = new OpsReader()
-        ops.processFiles(mm.savedOpsHome,)
+        ops.processFiles(mm.savedOpsHome, mm.savedRunId)
         mm.getSequence()
         SwingUtilities.invokeLater { ->
             log.debug("back from collection - reeneablling collect button")
@@ -124,6 +124,11 @@ class MainController {
             }
             db.initialize(mm.savedURL + ";SCHEMA=" + mm.savedSchema, mm.savedUserid, mm.savedPw)
             saver.writeValues()
+            if (mm.savedRunId.isBlank()) {
+                mm.currentStage = MainModel.ProcessStage.RUN_READY
+            } else {
+                mm.currentStage = MainModel.ProcessStage.COLLECTING
+            }
         }
         mm.checkRun()
     }
