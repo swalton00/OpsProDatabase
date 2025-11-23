@@ -22,7 +22,6 @@ class MainController {
 
     boolean validFields() {
         boolean fieldsValid = false
-
         return fieldsValid
     }
 
@@ -46,6 +45,11 @@ class MainController {
         mm.runComment.setText(newValue)
         SwingUtilities.invokeLater({
             mv.start()
+            mm.checkFields()
+            if (mm.currentStage.equals(MainModel.ProcessStage.CHECKING)) {
+                log.debug("already ready to run at startup")
+                buttonSaveValuesAction(null as ActionEvent)
+            }
         })
     }
 

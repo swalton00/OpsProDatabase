@@ -1,4 +1,3 @@
-set schema = parser;
 CREATE TABLE
     IF NOT EXISTS locations
     (

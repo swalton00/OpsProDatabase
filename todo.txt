@@ -19,3 +19,13 @@ Bugs to fix
         1) cars by locations
         2) locations with cars
         3) others?
+5. Add a new view type: Moves by car
+    a. show list of cars (with type) plus number of moves
+    b. option to show only cars that moved
+6. Move "Set OpsPro Home" up to save values
+7. Add a new Save option - profiles
+    a. Show list of profiles
+    b. Profile includes: Schema, Comment
+    c. Add parameter "Schema" to every SQL
+        1) Reference schema as pre-execution parameter ("${}")
+    d. New set of views to compare results between profile entries

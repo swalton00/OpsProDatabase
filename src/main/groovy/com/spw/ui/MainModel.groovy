@@ -171,11 +171,8 @@ class MainModel implements FocusListener {
                 log.debug("ready to move on to collecting")
                 collectButton.setEnabled(true)
                 currentStage = ProcessStage.COLLECTING
-
             }
         }
-
-
     }
 
     /**

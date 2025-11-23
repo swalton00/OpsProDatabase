@@ -47,7 +47,7 @@ asciidoctorPdf {
     dependsOn asciidoctorGemsPrepare
 
 
-    asciidoctorj {
+    asciidoctor {
         attributes 'build-gradle': file('build.gradle'),
                 'sourcedir': file('src/docs/asciidoc')
 

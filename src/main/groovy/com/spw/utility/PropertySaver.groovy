@@ -7,12 +7,12 @@ import org.slf4j.LoggerFactory
 @Singleton
 class PropertySaver {
 
-    private static final Logger log = LoggerFactory.getLogger(PropertySaver.class)
+        private static final Logger log = LoggerFactory.getLogger(PropertySaver.class)
 
-    static final String PROP_FILE_NAME = "OpsCar_properties.properties"
-    static final String HOME_DIR = ".rrdecoder"
+        static final String PROP_FILE_NAME = "OpsCar_properties.properties"
+        static final String HOME_DIR = ".rrdecoder"
 
-    Properties properties = new Properties()
+        Properties properties = new Properties()
 
     boolean inited = false
     boolean dirty = false

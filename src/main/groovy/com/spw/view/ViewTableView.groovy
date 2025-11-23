@@ -118,12 +118,7 @@ class ViewTableView {
         int screenHeight = toolkit.getScreenSize().getHeight()
         Integer locx = saver.getInt("table", thisDialog.getXname())
         Integer locy = saver.getInt("table", thisDialog.getYname())
-        if (locx == null) {
-            locx = (screenWidth - dialogWidth)/2
-            locy = (screenHeight - dialogHeight) / 2
-            saver.saveInt("table", thisDialog.getXname(), locx)
-            saver.saveInt("table", thisDialog.getYname(), locy)
-        }
+
         Integer dialogWidth = saver.getInt("table", thisDialog.getWidthName())
         if (dialogWidth == null) {
             dialogWidth = 1000
@@ -133,6 +128,12 @@ class ViewTableView {
         if (dialogHeight == null) {
             dialogHeight = 1200
             saver.saveInt("table", thisDialog.getHeightName(), dialogHeight)
+        }
+        if (locx == null) {
+            locx = (screenWidth - dialogWidth)/2
+            locy = (screenHeight - dialogHeight) / 2
+            saver.saveInt("table", thisDialog.getXname(), locx)
+            saver.saveInt("table", thisDialog.getYname(), locy)
         }
         thisDialog.setPreferredSize(new Dimension(dialogWidth, dialogHeight))
         thisDialog.setLocation(locx, locy)
