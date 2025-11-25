@@ -6,7 +6,8 @@ CREATE TABLE
         xmlid    VARCHAR(32),
         name     VARCHAR(255) NOT NULL,
         trkCount INT NOT NULL DEFAULT 0,
-        UNIQUE (runid, xmlid)
+        UNIQUE (runid, xmlid),
+        UNIQUE (runid, id)
     );
 CREATE TABLE
     IF NOT EXISTS tracks
