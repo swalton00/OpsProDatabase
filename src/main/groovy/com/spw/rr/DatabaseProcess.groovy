@@ -103,6 +103,9 @@ class DatabaseProcess extends AbstractDatabase {
         log.debug("validating parameters ${userid}, ${url}, ${schema}")
         try {
             log.debug("testing the database connection")
+            if (!url.startsWith("jdbc:h2:")) {
+                return false
+            }
             conn = DriverManager.getConnection(url, userid, pw)
             if (conn != null) {
                 log.trace("got a good connection with that URL, userid and password")
@@ -146,6 +149,7 @@ class DatabaseProcess extends AbstractDatabase {
         } catch (Exception e) {
             log.error("caught an exception validating fields", e)
             returnMessage.setText("Error validating fields", Message.Level.ERROR)
+            returnValue = false
         } finally {
             log.debug("closing the connection (if any)")
             if (conn != null) {

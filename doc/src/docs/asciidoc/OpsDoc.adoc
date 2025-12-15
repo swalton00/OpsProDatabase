@@ -19,6 +19,66 @@ that the cars are moving the way you want them.
 
 == Installation
 
+There is no installation process. Simply extract the files
+contained in the distribution zip to an empty folder.
+Change to the "bin" folder inside the resulting structure and
+execute either the "Ops_pro_car_progress.bat" or the
+"Ops_pro_car_progress" depending on your operating system
+(.bat for Windows, the other for Unix or Mac).
+
+This program requires Java, at least at version 11, but supports up
+to 21. This is the same as the JMRI requirement.
+
+There are several values that must be entered the first time you
+run the program. When you run the program for the first time, you
+will see the following dialog. The various fields must be filled in
+and saved before you can continue (unless you exit).
+
+image::Empty_dialog.png[Initial empty dialog]
+
+==== The fields in the Dialog
+
+image::Annotated_Save_dialog.png[Dialog with pointers]
+
+==== Userid
+
+The Userid field (labeled "A" in the image above) will become the userid
+for the database. If you won't be interacting with database except through
+this application, this field is not that important, but it must have a value.
+You can use any value you want, but it should start with a letter, consist
+of letters, numbers and perhaps an underscore. There is no specific length
+requirement, but you should keep it relatively short. If you will be
+interacting with the database with another tool, you should keep track of
+this (and the following) values.
+
+==== Password
+
+The password field ("B" above) is another required field. This value
+is case dependent. The information will be shown as asterisks as you
+enter it.
+
+WARNING: This field is stored in unencrypted form! Do not use the
+password from any other system here. There is no security risk with
+this password since the data is not financially important and the database
+will be not be shared on the intern
+
+==== Schema
+
+Another required field (labeled "C"). It should start with a letter and
+contain only letters, numbers, and possibly underscores. This will
+be used to qualify the data in the database.
+
+==== Operations Homes
+
+The location of the OpPro data. Either enter it in the field labeled "D",
+or use the the "Select Operations Home" button to find the correct
+location. This button will open a file chooser dialog which
+will allow you to select the "operations" directory of your
+JMRI installation. This directory will typically contain a
+number of files beginning with "Operations" and ending with ".xml" (you
+might not see the ending, depending on your operating system settings).
+This directory is in the location chosen
+
 
 
 

@@ -153,6 +153,8 @@ class MainController {
     def selectHomeAction = { ActionEvent ->
         log.debug("showing a dialog to choose an OpsPro Home")
         JFileChooser chooser = new JFileChooser()
+        boolean hiddenFiles = chooser.isFileHidingEnabled()
+        chooser.setFileHidingEnabled(false)
         chooser.setDialogTitle("Select OpsPro Home Directory")
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
         int returnValue = chooser.showDialog(null, "Select OpsPro Home")
