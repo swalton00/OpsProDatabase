@@ -30,19 +30,19 @@ class MainController {
         mm.setup()
         saver.init()
         String newValue = saver.getBaseString("userid")
-        mm.userid.setText(newValue)
+        mm.userid = newValue
         newValue = saver.getBaseString("password")
-        mm.pw.setText(newValue)
+        mm.password = newValue
         newValue = saver.getBaseString("opsHome")
-        mm.opsHome.setText(newValue)
+        mm.opsHome = newValue
         newValue = saver.getBaseString("schema")
-        mm.schema.setText(newValue)
+        mm.schema = newValue
         newValue = saver.getBaseString("url")
-        mm.url.setText(newValue)
+        mm.url = newValue
         newValue = saver.getBaseString("runId")
-        mm.runId.setText(newValue)
+        mm.runId = newValue
         newValue = saver.getBaseString("runComment")
-        mm.runComment.setText(newValue)
+        mm.runComment = newValue
         SwingUtilities.invokeLater({
             mv.start()
             mm.checkFields()

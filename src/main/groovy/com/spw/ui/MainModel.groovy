@@ -4,6 +4,7 @@ import com.spw.rr.DatabaseProcess
 import com.spw.utility.Message
 import com.spw.utility.PropertySaver
 import com.spw.utility.RunTasks
+import groovy.beans.Bindable
 import groovy.transform.ToString
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -40,11 +41,11 @@ class MainModel implements FocusListener {
     boolean runReady = false
     boolean viewReady = false
 
-    boolean validHome = false
-    boolean validUserid = false
-    boolean validPassword = false
-    boolean validSchema = false
-    boolean validURL = false
+    @Bindable Boolean validHome = false
+    @Bindable Boolean validUserid = false
+    @Bindable Boolean validPassword = false
+    @Bindable Boolean validSchema = false
+    @Bindable Boolean validURL = false
 
     Integer nextSequence = 0
     String savedUserid
@@ -55,24 +56,18 @@ class MainModel implements FocusListener {
     String savedRunComment
     String savedOpsHome
 
-    JTextField userid = new JTextField("")
-    JPasswordField pw = new JPasswordField("")
-    JTextField url = new JTextField("")
-    JTextField schema = new JTextField("")
-    JTextField opsHome = new JTextField("")
-    JTextField runId = new JTextField("")
-    JTextField runComment = new JTextField("")
-    JLabel currentSequence = new JLabel("")
-    JButton exitButton = new JButton("Exit")
-    JButton saveValues = new JButton("Save Values")
-    JButton collectButton = new JButton("Collect Data")
-    JButton buttonView = new JButton("View Data")
-    JButton buttonExport = new JButton("Export Data")
-    JButton buttonOpsHome = new JButton("Select Operations Home")
+    @Bindable String userid = ""
+    @Bindable String password = ""
+    @Bindable String url = ""
+    @Bindable String schema = ""
+
+    @Bindable String opsHome
+    @Bindable String runId
+    @Bindable String runComment
+    //@Bindable String message
 
     Message message = new Message()
-    JPanel messagePanel
-    JLabel messageLabel
+
 
     String priorValue
     String newValue
@@ -99,10 +94,10 @@ class MainModel implements FocusListener {
 
     void checkFields() {
         if (SwingUtilities.isEventDispatchThread()) {
-            innerCheckFields()
+           //  innerCheckFields()
         } else {
             SwingUtilities.invokeLater { ->
-                innerCheckFields()
+         //       innerCheckFields()
             }
         }
 
@@ -214,7 +209,7 @@ class MainModel implements FocusListener {
     }
 
     void setup() {
-        userid.setText(checkNotNull("userid"))
+ /*       userid.setText(checkNotNull("userid"))
         pw.setText(checkNotNull("password"))
         url.setText(checkNotNull("url"))
         schema.setText(checkNotNull("schema"))
@@ -224,7 +219,7 @@ class MainModel implements FocusListener {
         url.addFocusListener(this)
         schema.addFocusListener(this)
         opsHome.addFocusListener(this)
-        runId.addFocusListener(this)
+        runId.addFocusListener(this)*/
         checkFields()
     }
 
@@ -324,7 +319,7 @@ class MainModel implements FocusListener {
         }
         if (currentStage.equals(ProcessStage.CHECKING)) {
             log.debug("focus lost and current stage is ${currentStage} value should be ${ProcessStage.CHECKING}")
-            innerCheckFields()
+           // innerCheckFields()
         } else if (currentStage.equals(ProcessStage.COLLECTING) | currentStage.equals(ProcessStage.RUN_READY)) {
             log.debug("current stage is RUN_READY and got focus lost")
             if (e.getComponent().getName().equals("runid")) {
