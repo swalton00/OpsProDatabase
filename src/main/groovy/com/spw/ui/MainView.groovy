@@ -2,6 +2,7 @@ package com.spw.ui
 
 import com.spw.utility.FrameHelper
 import com.spw.utility.Message
+import com.spw.utility.ObservableString
 import com.spw.utility.OpDialog
 import com.spw.utility.PropertySaver
 import net.miginfocom.swing.MigLayout
@@ -9,9 +10,13 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import javax.swing.*
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 import java.awt.*
+import java.beans.PropertyChangeEvent
+import java.beans.PropertyChangeListener
 
-class MainView {
+class MainView implements DocumentListener {
     MainController mc
     MainModel mm
     JFrame mainFrame
@@ -54,6 +59,39 @@ class MainView {
         field.setFont(newFont)
     }
 
+
+    /**
+     * Setup the various elements needed on the UI interface fields
+     * @param modelField The String that should be in Model
+     * @param viewField The textfield - will get the name of "fieldName"
+     * @param fieldName the name for the field
+     * Get the value from the the model field and assign it the Text of JTextField
+     * Set the name value of the JTextField
+     * Add this as a Documentlisterner for the JTextfield
+     *
+     */
+    private void setupTextField(ObservableString modelField, JTextField viewField, String fieldName) {
+        viewField.setText(modelField.getValue())
+        viewField.setName(fieldName)
+        viewField.getDocument().addDocumentListener(this)
+        viewField.getDocument().putProperty("parent", viewField)
+        def listener = { e ->
+            if (e.oldValue.equals(e.newValue)) {
+                return
+            }
+            if (viewField instanceof JPasswordField) {
+                if (e.newValue.equals((JPasswordField) viewField.getPassword)) {
+                    return
+                }
+            } else if (e.newValue.equals(viewField.getText())) {
+                return
+            }
+            viewField.setText(e.newValue)
+        } as PropertyChangeListener
+        modelField.addPropertyChangeListener(listener)
+        viewField.getDocument().addDocumentListener(this)
+    }
+
     public void start() {
         mainFrame = new JFrame()
         mainFrame.addComponentListener(new FrameHelper())
@@ -86,27 +124,41 @@ class MainView {
         contentPanel.setLayout(new MigLayout())
         contentPanel.add(labelUserid, "right, cell 0 1")
         userid.setToolTipText("Enter a user identifier - 1 to 8 characters, starting with a letter")
-        userid.setName("userid")
+        setupTextField(mm.userid, userid, "userid")
         contentPanel.add(userid, "wrap")
         JLabel labelPassword = new JLabel("Password:")
         contentPanel.add(labelPassword, "right")
-        pw.setName("password")
         pw.setToolTipText("Enter the password for this user (will create if this is a new database)")
+        pw.setText(mm.password.getValue())
+        pw.setName("password")
+        pw.getDocument().addDocumentListener(this)
+        pw.getDocument().putProperty("parent", pw)
+        def listener = { e ->
+            if (e.oldValue.equals(e.newValue)) {
+                return
+            }
+            if (e.newValue.equals(new String(pw.getPassword()))) {
+                return
+            }
+            mm.password.setValue(new String(pw.getPassword()))
+        }
+        pw.addPropertyChangeListener(listener)
+        pw.getDocument().addDocumentListener(this)
         contentPanel.add(pw, "wrap")
         JLabel labelSchema = new JLabel("Schema:")
         contentPanel.add(labelSchema, "right")
-        schema.setName("schema")
+        setupTextField(mm.schema, schema, "schema")
         schema.setToolTipText("Enter the schema to use in the database (default 'parser')")
         contentPanel.add(schema, "wrap")
         JLabel labelOpsHome = new JLabel("Operations Home")
         contentPanel.add(labelOpsHome, "right")
-        opsHome.setName("opshome")
+        setupTextField(mm.opsHome, opsHome, "opshome")
         opsHome.setToolTipText("Enter the location of the Operations Home direcotory (or the use the button below)")
         contentPanel.add(opsHome, "wrap")
         JLabel labelUrl = new JLabel("Database URL:")
         labelUrl.setHorizontalAlignment(SwingConstants.RIGHT)
         contentPanel.add(labelUrl, "right")
-        url.setName("url")
+        setupTextField(mm.url, url, "url")
         url.setToolTipText("URL for the database in the form: 'jdbc:h2:file:<fullpath>")
         contentPanel.add(url, "wrap")
         JLabel labelSave = new JLabel("Press the button to save the values:")
@@ -124,12 +176,12 @@ class MainView {
         contentPanel.add(labelRuns, "center, span 2, wrap")
         JLabel labelRunId = new JLabel("Run Identiefier")
         contentPanel.add(labelRunId, "right")
-        runId.setName("runid")
+        setupTextField(mm.runId, runId, "runid")
         runId.setToolTipText("Enter a label to identify this set of runs")
         contentPanel.add(runId, "wrap")
         JLabel labelRunComment = new JLabel("Run comment")
         contentPanel.add(labelRunComment, "right")
-
+        setupTextField(mm.runComment, runComment, "runcomment")
         runComment.setName("runcomment")
         runComment.setToolTipText("Enter a comment about the set of runs")
         contentPanel.add(runComment, "wrap")
@@ -229,5 +281,58 @@ class MainView {
             }
         }
 
+    }
+
+    private void textChangeInner(DocumentEvent e, ObservableString field, String newValue) {
+        if (field.getValue().equals(newValue)) {
+            return
+        }
+        field.setValue(newValue)
+    }
+
+    private void textChanges(DocumentEvent e) {
+        JTextField theField = (JTextField) e.getDocument().getProperty("parent")
+        String theValue = theField.getText()
+        println("now in the TextChanges method old is ${theValue}")
+        switch (theField.getName()) {
+            case "userid":
+                textChangeInner(e, mm.userid, theValue)
+                break
+            case "opshome":
+                textChangeInner(e, mm.opsHome, theValue)
+                break
+            case "url":
+                textChangeInner(e, mm.url, theValue)
+                break
+            case "password":
+                textChangeInner(e, mm.password, theValue)
+                break
+            case "schema":
+                textChangeInner(e, mm.schema, theValue)
+                break
+            case "runid":
+                textChangeInner(e, mm.runId, theValue)
+                break
+            case "runcomment":
+                textChangeInner(e, mm.runComment, theValue)
+                break
+            default:
+                log.error("Got an unknown fieldName in switch statement ${theValue}")
+        }
+    }
+
+    @Override
+    void insertUpdate(DocumentEvent e) {
+        textChanges(e)
+    }
+
+    @Override
+    void removeUpdate(DocumentEvent e) {
+        textChanges(e)
+    }
+
+    @Override
+    void changedUpdate(DocumentEvent e) {
+        log.error("got a Document changedUpdate event - this should not happen!", e)
     }
 }

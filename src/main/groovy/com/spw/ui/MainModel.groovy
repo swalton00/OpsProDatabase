@@ -2,6 +2,7 @@ package com.spw.ui
 
 import com.spw.rr.DatabaseProcess
 import com.spw.utility.Message
+import com.spw.utility.ObservableString
 import com.spw.utility.PropertySaver
 import com.spw.utility.RunTasks
 import groovy.beans.Bindable
@@ -56,14 +57,14 @@ class MainModel implements FocusListener {
     String savedRunComment
     String savedOpsHome
 
-    @Bindable String userid = ""
-    @Bindable String password = ""
-    @Bindable String url = ""
-    @Bindable String schema = ""
+    ObservableString userid = new ObservableString("")
+    ObservableString password = new ObservableString("")
+    ObservableString url = new ObservableString("")
+    ObservableString schema = new ObservableString("")
 
-    @Bindable String opsHome
-    @Bindable String runId
-    @Bindable String runComment
+    ObservableString opsHome = new ObservableString("")
+    ObservableString runId = new ObservableString("")
+    ObservableString runComment = new ObservableString("")
     //@Bindable String message
 
     Message message = new Message()
