@@ -41,7 +41,7 @@ test {
 }
 
 tasks.withType(JavaCompile) {
-    options.release = 11 // Set your desired Java version here
+    options.release = 21 // Set your desired Java version here
 }
 
 tasks.register("runCollect", JavaExec) {
