@@ -3,10 +3,9 @@ package com.spw.rr
 import com.spw.mappers.MapperInterface
 import com.spw.mappers.RunId
 import com.spw.mappers.RunLoc
-import com.spw.mappers.SequenceValue
 import com.spw.utility.ApplyResources
 import com.spw.utility.Message
-
+import org.apache.ibatis.session.SqlSession
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.sql.Connection
@@ -63,7 +62,7 @@ class DatabaseProcess extends AbstractDatabase {
     }
 
     /**
-     * Returns the next sequnce number or zero if none
+     * Returns the next sequence number or zero if none
      * @param userid
      * @param password
      * @param url
@@ -76,8 +75,8 @@ class DatabaseProcess extends AbstractDatabase {
         runWithConnection(userid, password, url, schema, runid, GET_SEQ_MAX)
     }
 
-    public int getSequnceCount(String userid, String password, String url, String schema, String runid) {
-        log.debug("getting the count of sequnces for this runId")
+    public int getSequenceCount(String userid, String password, String url, String schema, String runid) {
+        log.debug("getting the count of sequences for this runId")
         runWithConnection(userid, password, url, schema, runid, GET_SEQ_COUNT)
     }
 
@@ -88,6 +87,34 @@ class DatabaseProcess extends AbstractDatabase {
     String url
     Message mess
 
+
+    /**
+     * Verify that userid, password and url will work
+     * @param userid the userid
+     * @param pw the password
+     * @param url the URL which should start with "jdbc:h2:"
+     * @return true if the connection succeeds
+     */
+    boolean verifyConnect(String userid, String pw, String url) {
+        boolean retValue = false
+        log.debug("verify that we can connect via userid ${userid} and url ${url}")
+        Connection conn = null
+        try {
+            conn = DriverManager.getConnection(url, userid, pw)
+            if (conn != null) {
+                log.debug("connection succeeded")
+                retValue = true
+            }
+        } catch (Exception e) {
+            log.error("Connection failed - exception was ${e.getMessage()}", e)
+        } finally {
+            if (conn != null) {
+                conn.close()
+            }
+        }
+        return retValue
+    }
+
 /**
  * Returns TRUE is the fields represent a valid database connection
  * @param userid
@@ -96,7 +123,7 @@ class DatabaseProcess extends AbstractDatabase {
  * @param schema
  * @return true if the fields result in a valid database connection
  */
-    boolean validateFieslds(String userid, String pw, String url, String schema, Message returnMessage) {
+    boolean validateFields(String userid, String pw, String url, String schema, Message returnMessage) {
         log.debug("now in the validator")
         boolean returnValue = false // return false if there are any issues
         Connection conn = null
@@ -162,22 +189,33 @@ class DatabaseProcess extends AbstractDatabase {
 
     void setRunId(String runId, String runComment) {
         log.debug("setting runid to ${runId}")
-        MapperInterface map = session.getMapper(MapperInterface.class)
-        RunId thisRunId = map.selectRunId(runId)
-        Integer nextSequence = map.getSequenceMax(runId) + 1
-        currentSequence = nextSequence
-        if (thisRunId == null) {
-            log.debug("don't have a current sequnce -- setting it to ${nextSequence}")
-            RunId newRunId = new RunId()
-            newRunId.runid = runId
-            newRunId.comment = runComment
-            newRunId.sequenceNumber = nextSequence
-            map.insertRunId(newRunId)
-        } else {
-            log.debug("updating sequence to new value of ${nextSequence}")
-            thisRunId.comment = runComment
-            thisRunId.sequenceNumber = nextSequence
-            map.updateRunId(thisRunId)
+        SqlSession session = null
+        try {
+            session = getSession()
+            MapperInterface map = session.getMapper(MapperInterface.class)
+            RunId thisRunId = map.selectRunId(runId)
+            Integer nextSequence = map.getSequenceMax(runId) + 1
+            currentSequence = nextSequence
+            if (thisRunId == null) {
+                log.debug("don't have a current sequnce -- setting it to ${nextSequence}")
+                RunId newRunId = new RunId()
+                newRunId.runid = runId
+                newRunId.comment = runComment
+                newRunId.sequenceNumber = nextSequence
+                map.insertRunId(newRunId)
+            } else {
+                log.debug("updating sequence to new value of ${nextSequence}")
+                thisRunId.comment = runComment
+                thisRunId.sequenceNumber = nextSequence
+                map.updateRunId(thisRunId)
+            }
+        } catch (Exception e) {
+            log.error("Exception working with the database", e)
+        } finally {
+            if (session != null) {
+                log.debug("closing the session now")
+                session.close()
+            }
         }
     }
 
@@ -188,42 +226,86 @@ class DatabaseProcess extends AbstractDatabase {
 
     void mergeCar(Car thisCar) {
         log.debug("merging current car into database ${thisCar}")
-        MapperInterface map = session.getMapper(MapperInterface.class)
-        map.mergeCar(thisCar)
+        SqlSession session = null
+        try {
+            session = getSession()
+            MapperInterface map = session.getMapper(MapperInterface.class)
+            map.mergeCar(thisCar)
+        } catch (Exception e) {
+            log.error("Exception working with the database", e)
+        } finally {
+            if (session != null) {
+                log.debug("closing the session now")
+                session.close()
+            }
+        }
     }
+
 
     void insertRunLoc(RunLoc runLoc) {
         log.debug("inserting this runLoc ${runLoc}")
-        MapperInterface map = session.getMapper(MapperInterface.class)
-        map.insertRunLoc(runLoc)
+        SqlSession session = null
+        try {
+            session = getSession()
+            MapperInterface map = session.getMapper(MapperInterface.class)
+            map.insertRunLoc(runLoc)
+        } catch (Exception e) {
+            log.error("Exception working with the database", e)
+        } finally {
+            if (session != null) {
+                log.debug("closing the session now")
+                session.close()
+            }
+        }
     }
 
     Location findLocation(Location location) {
         log.debug("finding or creating the Location record")
-        MapperInterface map = session.getMapper(MapperInterface.class)
-        Location locValue = map.getLocation(location)
-        if (locValue == null) {
-            log.debug("Location was not found - inserting")
-            map.insertLocation(location)
-            locValue = location
-            log.debug("resulting location was ${location}")
+        SqlSession session = null
+        Location locValue = null
+        try {
+            session = getSession()
+            MapperInterface map = session.getMapper(MapperInterface.class)
+            locValue = map.getLocation(location)
+            if (locValue == null) {
+                log.debug("Location was not found - inserting")
+                map.insertLocation(location)
+                locValue = location
+                log.debug("resulting location was ${location}")
+            }
+            return locValue
+        } catch (Exception e) {
+            log.error("Exception working with the database", e)
+        } finally {
+            if (session != null) {
+                log.debug("closing the session now")
+                session.close()
+            }
+
         }
         return locValue
     }
 
     void mergeTrack(Track thisTrk) {
         log.debug("inserting or updating this location ${thisTrk}")
-
-        MapperInterface map = session.getMapper(MapperInterface.class)
-        Track original = map.getTrack(thisTrk)
-        if (original == null) {
-            log.debug("track was not found - adding it - ${thisTrk}")
-            map.insertTrack(thisTrk)
-        } else {
-            thisTrk.id = original.id
-            log.debug("updating track to be ${thisTrk}")
-            map.updateTrack(thisTrk)
+        SqlSession session = null
+        try {
+            session = getSession()
+            MapperInterface map = session.getMapper(MapperInterface.class)
+            Track original = map.getTrack(thisTrk)
+            if (original == null) {
+                log.debug("track was not found - adding it - ${thisTrk}")
+                map.insertTrack(thisTrk)
+            } else {
+                thisTrk.id = original.id
+                log.debug("updating track to be ${thisTrk}")
+                map.updateTrack(thisTrk)
+            }
+        } catch (Exception e) {
+            log.error("Exception working with the database", e)
+        } finally {
+            log.debug("closing the session now")
+            session.close()
         }
     }
-
 }

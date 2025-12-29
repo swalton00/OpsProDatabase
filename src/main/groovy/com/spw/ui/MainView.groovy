@@ -13,10 +13,12 @@ import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import java.awt.*
+import java.awt.event.FocusEvent
+import java.awt.event.FocusListener
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
-class MainView implements DocumentListener {
+class MainView implements DocumentListener, FocusListener{
     MainController mc
     MainModel mm
     JFrame mainFrame
@@ -73,6 +75,7 @@ class MainView implements DocumentListener {
     private void setupTextField(ObservableString modelField, JTextField viewField, String fieldName) {
         viewField.setText(modelField.getValue())
         viewField.setName(fieldName)
+        viewField.addFocusListener(this)
         viewField.getDocument().addDocumentListener(this)
         viewField.getDocument().putProperty("parent", viewField)
         def listener = { e ->
@@ -130,6 +133,7 @@ class MainView implements DocumentListener {
         contentPanel.add(labelPassword, "right")
         pw.setToolTipText("Enter the password for this user (will create if this is a new database)")
         pw.setText(mm.password.getValue())
+        pw.addFocusListener(this)
         pw.setName("password")
         pw.getDocument().addDocumentListener(this)
         pw.getDocument().putProperty("parent", pw)
@@ -242,29 +246,26 @@ class MainView implements DocumentListener {
             saver.saveInt("main", OpDialog.getYname(), frameLocY)
         }
         mainFrame.setLocation(frameLocX, frameLocY)
-        mm.readyToCheck = true
-        mm.currentStage = MainModel.ProcessStage.CHECKING
-        mm.checkFields()
         mainFrame.setVisible(true)
     }
 
     private void edtUpdate(Message theMessage) {
         log.debug("entered the edt update routine - message was ${theMessage}")
-        String oldMessage = message.messageLabel.getText()
+        String oldMessage = mm.message.messageLabel.getText()
         log.debug("message old is ${oldMessage} and new message is ${theMessage.text}")
-        message.messageLabel.setText(theMessage.text)
+       mm. message.messageLabel.setText(theMessage.text)
         switch (theMessage.msgLevel) {
             case Message.Level.ERROR:
-                message.messageLabel.setBackground(Color.RED)
-                message.messageLabel.setForeground(Color.WHITE)
+               mm. message.messageLabel.setBackground(Color.RED)
+               mm. message.messageLabel.setForeground(Color.WHITE)
                 break
             case Message.Level.WARNING:
-                message.messageLabel.setBackground(Color.YELLOW)
-                message.messageLabel.setForeground(Color.BLACK)
+               mm. message.messageLabel.setBackground(Color.YELLOW)
+               mm. message.messageLabel.setForeground(Color.BLACK)
                 break
             case Message.Level.INFO:
-                message.messageLabel.setBackground(Color.WHITE)
-                message.messageLabel.setForeground(Color.BLACK)
+               mm. message.messageLabel.setBackground(Color.WHITE)
+               mm. message.messageLabel.setForeground(Color.BLACK)
                 break
             default:
                 log.error("msgLevel was an unknown value ${theMessage.msgLevel}")
@@ -293,7 +294,6 @@ class MainView implements DocumentListener {
     private void textChanges(DocumentEvent e) {
         JTextField theField = (JTextField) e.getDocument().getProperty("parent")
         String theValue = theField.getText()
-        println("now in the TextChanges method old is ${theValue}")
         switch (theField.getName()) {
             case "userid":
                 textChangeInner(e, mm.userid, theValue)
@@ -334,5 +334,39 @@ class MainView implements DocumentListener {
     @Override
     void changedUpdate(DocumentEvent e) {
         log.error("got a Document changedUpdate event - this should not happen!", e)
+    }
+
+    String previousValue
+
+    @Override
+    void focusGained(FocusEvent e) {
+        Component comp = e.getComponent()
+        String compName = comp.getName()
+        log.trace("focus gained for ${comp}")
+        if (comp instanceof JPasswordField) {
+            previousValue = new String(comp.getPassword())
+        }  else {
+            previousValue = comp.getText()
+        }
+        log.debug("previous value is ${previousValue}")
+    }
+
+    @Override
+    void focusLost(FocusEvent e) {
+        Component comp = e.getComponent()
+        String compName = comp.getName()
+        log.trace("focus lost for ${comp}")
+        String newValue
+        if (comp instanceof JPasswordField) {
+            newValue = new String(comp.getPassword())
+        } else {
+            newValue = comp.getText()
+        }
+        if (!newValue.equals(previousValue)) {
+            log.debug("values changed - old = ${previousValue} - new = ${newValue}")
+            mc.checkChange(compName)
+        } else {
+            log.debug("values are the same - new/old = ${previousValue}")
+        }
     }
 }

@@ -16,6 +16,7 @@ class PropertySaver {
 
     boolean inited = false
     boolean dirty = false
+    Boolean initValue = false
 
 
     private File getHomeLocation() {
@@ -32,9 +33,14 @@ class PropertySaver {
         return rrHome
     }
 
-    public void init() {
+    public boolean init() {
+        if (inited) {
+            log.debug("skipping init - already inited - returning ${initValue}")
+            return initValue
+        }
         log.debug("Initializing the PropertySaver")
         InputStream inputStream
+        boolean retValue = false
         try {
             inputStream = new FileInputStream(new File(getHomeLocation(), PROP_FILE_NAME))
         } catch (FileNotFoundException exception) {
@@ -44,6 +50,8 @@ class PropertySaver {
             try {
                 properties.load(inputStream)
                 inputStream.close()
+                retValue = true
+                initValue = true
             } catch (IOException ex) {
                 log.error("IO error loading properties", ex)
             }
@@ -51,6 +59,7 @@ class PropertySaver {
         }
         inited = true
         dirty = false
+        return retValue
     }
 
     public void writeValues() {

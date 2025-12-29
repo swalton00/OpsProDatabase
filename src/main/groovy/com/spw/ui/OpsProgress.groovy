@@ -21,7 +21,6 @@ class OpsProgress {
 
     static void main(String[] args) {
         log.trace("starting the application")
-        PropertySaver.getInstance().init()
         MainController mc = new MainController()
         mc.start()
     }
