@@ -16,18 +16,14 @@ import javax.swing.SwingUtilities
 class MainModel {
 
     private MainController mc = null
-    private MainView mv = null
     private static final Logger log = LoggerFactory.getLogger(MainModel.class)
     private static final DatabaseProcess db = DatabaseProcess.getInstance()
     private static final PropertySaver saver = PropertySaver.getInstance()
-    RunTasks taskRunner = RunTasks.getInstance()
 
     public MainModel(MainController mc) {
         this.mc = mc
-        setup(mv)
+        setup()
     }
-
-    String homeValue
 
     boolean readyToCheck = false
     boolean fieldsValid = false
@@ -70,15 +66,16 @@ class MainModel {
     Boolean valueChanged
 
     /*
-            four stages
-                1. before ui displayed (don'ct check anything)
-                2. before all fields are valid (check opsHome, userid, pw, url, schema)
-                3. after enabling SaveValues (check for runId set
-                4. after enbaling dataCollect
+            five stages
+                1. INITIAL before ui displayed (don'ct check anything)
+                2. LOOKING before all fields are valid (check opsHome, userid, pw, url, schema)
+                3. RUN_READY after enabling SaveValues (check for runId set
+                4. COLLECTING after enbaling dataCollect
+                5. RESET_VALUES renabling entry fields for new values (requires restart)
      */
 
     public enum ProcessStage {
-        INITIAL, STARTUP, LOOKING, CHECKING, VERIFYREADY, SAVEREADY, NEED_RUNID, RUN_READY, COLLECTING
+        INITIAL, LOOKING, RUN_READY, COLLECTING, RESET_VALUES
     }
 
     ProcessStage currentStage = ProcessStage.INITIAL
@@ -88,34 +85,7 @@ class MainModel {
     public MainModel() {
     }
 
-    /**
-     * must be called in the background thread
-     * read the count of sequences
-     */
-    Runnable getSequence = () ->  {
-        if (SwingUtilities.isEventDispatchThread()) {
-            log.error("getSequence called from UI thread!")
-            return
-        }
-        saver.putBaseString("runId", savedRunId)
-        saver.putBaseString(("runComment"), savedRunComment)
-        nextSequence = db.getSequence(savedUserid, savedPw, savedURL, savedSchema, savedRunId)
-        Integer seqCount = db.getSequenceCount(savedUserid, savedPw, savedURL, savedSchema, savedRunId)
-        if (seqCount > 0) {
-            log.debug("sequence count is > 0 (${seqCount} - enabling views")
-            viewReady = true
-        } else {
-            viewReady = false
-        }
-        SwingUtilities.invokeLater { ->
-            mv.currentSequence.setText(Integer.toString(nextSequence))
-            if (viewReady) {
-                log.debug('now enabling views')
-                mv.buttonView.setEnabled(true)
-                mv.buttonExport.setEnabled(true)
-            }
-        }
-    }
+
 
     String checkNotNull(String key) {
         String temp = saver.getBaseString(key)
@@ -126,8 +96,7 @@ class MainModel {
         return temp
     }
 
-    void setup(MainView mv) {
-        this.mv = mv
+    void setup() {
         log.trace("setup in MainModel is now complete")
     }
 

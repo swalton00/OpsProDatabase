@@ -15,7 +15,6 @@ import javax.swing.event.DocumentListener
 import java.awt.*
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
-import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
 class MainView implements DocumentListener, FocusListener{
@@ -36,15 +35,15 @@ class MainView implements DocumentListener, FocusListener{
     JTextField runId = new JTextField("", 8)
     JTextField runComment = new JTextField("", 20)
     JLabel currentSequence = new JLabel("")
-    JButton exitButton = new JButton("Exit")
-    JButton saveValues = new JButton("Save Values")
-    JButton collectButton = new JButton("Collect Data")
+    JButton buttonExit = new JButton("Exit")
+    JButton buttonSave = new JButton("Save Values")
+    JButton buttonCollect = new JButton("Collect Data")
     JButton buttonView = new JButton("View Data")
     JButton buttonExport = new JButton("Export Data")
     JButton buttonOpsHome = new JButton("Select Operations Home")
 
     JPanel messagePanel
-    JLabel messageLabel
+
 
     MainView(MainController mc, MainModel mm) {
         this.mc = mc
@@ -167,10 +166,10 @@ class MainView implements DocumentListener, FocusListener{
         contentPanel.add(url, "wrap")
         JLabel labelSave = new JLabel("Press the button to save the values:")
         contentPanel.add(labelSave, "right")
-        saveValues.setToolTipText("Press this button to save the values and open the database")
-        saveValues.setEnabled(false)
-        saveValues.addActionListener(mc.buttonSaveValuesAction)
-        contentPanel.add(saveValues, "left, wrap")
+        buttonSave.setToolTipText("Press this button to save the values and open the database")
+        buttonSave.setEnabled(false)
+        buttonSave.addActionListener(mc.buttonSaveValuesAction)
+        contentPanel.add(buttonSave, "left, wrap")
 
         JSeparator sep1 = new JSeparator()
         sep1.setPreferredSize(new Dimension(100, 5))
@@ -195,10 +194,10 @@ class MainView implements DocumentListener, FocusListener{
         currentSequence.setToolTipText("Disabled field showing the current run number")
         makeLarger(currentSequence)
         contentPanel.add(currentSequence, "wrap")
-        collectButton.setEnabled(false)
-        collectButton.setToolTipText("Press this button to read and record the OpsPro Car and Location values")
-        collectButton.addActionListener(mc.buttonCollectAction)
-        contentPanel.add(collectButton, "center, wrap")
+        buttonCollect.setEnabled(false)
+        buttonCollect.setToolTipText("Press this button to read and record the OpsPro Car and Location values")
+        buttonCollect.addActionListener(mc.buttonCollectAction)
+        contentPanel.add(buttonCollect, "center, wrap")
 
         JSeparator sep2 = new JSeparator()
         sep2.setPreferredSize(new Dimension(80, 5))
@@ -209,14 +208,14 @@ class MainView implements DocumentListener, FocusListener{
         buttonView.addActionListener(mc.buttonViewAction)
         buttonView.setEnabled(false)
         contentPanel.add(buttonView, "center, wrap")
-        exitButton.addActionListener(mc.buttonExitAction)
+        buttonExit.addActionListener(mc.buttonExitAction)
         mainFrame.getContentPane().add(contentPanel, "center, span 2,wrap")
 
         JSeparator sep3 = new JSeparator()
         sep3.setPreferredSize(new Dimension(100, 15))
         mainFrame.getContentPane().add(sep3, "center, span 2, wrap")
         JPanel finalPanel = new JPanel(new MigLayout("gapx 5cm"))
-        finalPanel.add(exitButton)
+        finalPanel.add(buttonExit)
         buttonOpsHome.addActionListener(mc.selectHomeAction)
         buttonOpsHome.setToolTipText("Press this button open a new window to choose the OpsPro Home directory")
         finalPanel.add(buttonOpsHome)
@@ -281,8 +280,76 @@ class MainView implements DocumentListener, FocusListener{
                 edtUpdate(mess)
             }
         }
+    }
+
+    private void changeButton(JButton button, boolean newStatus)
+    {
+        if (SwingUtilities.isEventDispatchThread()) {
+            button.setEnabled(newStatus)
+        } else {
+            SwingUtilities.invokeLater {
+                button.setEnabled(newStatus)
+            }
+        }
+    }
+
+    public void changeSaveButton(boolean enable) {
+        log.debug("changing SaveButton enabled status to ${enable}")
+        changeButton(buttonSave, enable)
+    }
+
+    public void changeCollectButton(boolean enable)  {
+        log.debug("changing Collect button enabled to ${enable}")
+        changeButton(buttonCollect, enable)
+    }
+
+    public void changeViewButton(boolean enable) {
+        log.debug("Changing View button enabled to ${enable}")
+        changeButton(buttonView, enable)
+    }
+
+    public void changeExportButton(boolean enable) {
+        log.debug("Changing Export button to enabled ${enable}")
+        changeButton(buttonExport, enable)
+    }
+
+    private Runnable enableEntryInner(boolean enable) {
+        userid.setEnabled(enable)
+        pw.setEnabled(enable)
+        url.setEnabled(enable)
+        schema.setEnabled(enable)
+        opsHome.setEnabled(enable)
+        return null
+    }
+
+    public void enableEntryFields(boolean enable) {
+        log.debug("setting the entry fields to Enabled state of ${enable}")
+        if (SwingUtilities.isEventDispatchThread()) {
+            enableEntryInner(enable)
+        } else {
+            SwingUtilities.invokeAndWait {
+                enableEntryInner(enable)
+            }
+        }
+    }
+
+    private void setSequenceTextInner(String newText) {
+        currentSequence.setText(newText)
+    }
+
+    public void setSequenceText(String newText) {
+        log.debug("new sequence text is ${newText}")
+        if (SwingUtilities.isEventDispatchThread()) {
+            setSequenceTextInner(newText)
+        } else {
+            SwingUtilities.invokeLater {
+                setSequenceTextInner(newText)
+            }
+        }
 
     }
+
+
 
     private void textChangeInner(DocumentEvent e, ObservableString field, String newValue) {
         if (field.getValue().equals(newValue)) {

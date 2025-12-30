@@ -69,7 +69,9 @@ class MainController {
             } else {
                 return false
             }
-
+        } else {
+            log.debug("field ${fieldKey} is null - setting to empty string")
+            field.setValue("")
         }
         return false
     }
@@ -89,22 +91,7 @@ class MainController {
         }
     }
 
-    public void start() {
-        mm.currentStage = MainModel.ProcessStage.INITIAL
-        mv = new MainView(this, mm)
-        mm.setup(mv)
-        if (saver.init()) {
-            mm.validUserid = startField(mm.userid, "userid")
-            mm.validPassword = startField(mm.password, "password")
-            mm.validOpsHome = startField(mm.opsHome, "opsHome")
-            mm.validSchema = startField(mm.schema, "schema")
-            mm.validURL = startField(mm.url, "url")
-            mm.validRunId = startField(mm.runId, "runId")
-            checkAllFields()
-            mm.validRunComment =  startField(mm.runComment, "runComment")
-        } else {
-            mm.currentStage = MainModel.ProcessStage.LOOKING
-        }
+    private void addListeners() {
         mm.userid.addPropertyChangeListener {
             mm.validUserid = checkOneField(mm.userid)
             checkAllFields()
@@ -117,8 +104,8 @@ class MainController {
             mm.validSchema = checkOneField(mm.schema)
             checkAllFields()
             if (mm.currentStage.equals(MainModel.ProcessStage.SAVEREADY)) {
-                mv.collectButton.setEnabled(true)
-                mv.saveValues.setEnabled(false)
+                mv.buttonCollect.setEnabled(true)
+                mv.buttonSave.setEnabled(false)
                 mm.currentStage = MainModel.ProcessStage.COLLECTING
             }
         }
@@ -144,33 +131,71 @@ class MainController {
         mm.runComment.addPropertyChangeListener {
             mm.validRunComment = checkOneField(mm.runComment)
         }
-        if (mm.allFieldsValid) {
-            // run verify to check fields from Properties file
-            verifyDatabase
-            if (mm.verifyPassed) {
-                valuesSaved = true
-                db.initialize(mm.url.getValue(), mm.schema.getValue(),
-                        mm.userid.getValue(), mm.password.getValue())
+
+    }
+
+    private void saveFields() {
+        log.debug("copying current values to saved values")
+        mm.savedUserid = mm.userid.getValue()
+        mm.savedPw = mm.password.getValue()
+        mm.savedOpsHome = mm.opsHome.getValue()
+        mm.savedSchema = mm.schema.getValue()
+        mm.savedURL = mm.url.getValue()
+        mm.savedRunId = mm.runId.getValue()
+        mm.savedRunComment = mm.runComment.getValue()
+    }
+
+    Runnable initDatabase() {
+        log.debug("initializing the database")
+        verifyDatabase()
+        if (mm.verifyPassed) {
+            valuesSaved = true
+            db.initialize(mm.savedURL,
+                    mm.savedSchema,
+                    mm.savedUserid,
+                    mm.savedPw)
+            db.validateFields(mm.savedURL,
+                    mm.savedSchema,
+                    mm.savedUserid,
+                    mm.savedPw,
+                    new Message()
+            )  // complete database initialization
+            mv.enableEntryFields(false)
+            mv.changeSaveButton(false)
+            if (mm.validRunId) {
+                log.debug("Setting current stage to Collecting")
+                mm.currentStage = MainModel.ProcessStage.COLLECTING
+                mv.changeCollectButton(true)
+                setupSequence()
+            } else {
+                log.debug("setting current stage to RUN_READY as runId is ${mm.runId.getValue()}")
+                mm.currentStage = MainModel.ProcessStage.RUN_READY
+                mm.message.setText("Enter a RunId to enable Collecting", Message.Level)
             }
         }
-        SwingUtilities.invokeLater({
-            mv.start()
-            if (mm.currentStage == MainModel.ProcessStage.RUN_READY | mm.currentStage == MainModel.ProcessStage.COLLECTING) {
-                log.debug("all fields valid at startup")
-                mm.currentStage = MainModel.ProcessStage.NEED_RUNID
-                if (mm.validRunId) {
-                    mm.currentStage = MainModel.ProcessStage.COLLECTING
-                    mv.collectButton.setEnabled(true)
-                    runit.runIt(mm.getSequence)
-                } else {
-                    mm.currentStage = MainModel.ProcessStage.RUN_READY
-                    mm.message.setText("Enter a Run Id value to start collecting", Message.Level.INFO)
-                }
-            } else {
-                log.debug("setting current stage to LOOKING at startup")
-                mm.currentStage = MainModel.ProcessStage.LOOKING
-            }
-        })
+        return null
+    }
+
+    public void start() {
+        mm.currentStage = MainModel.ProcessStage.INITIAL
+        mv = new MainView(this, mm)
+        mm.setup()
+        saver.init()
+        mv.start()
+        mm.validUserid = startField(mm.userid, "userid")
+        mm.validPassword = startField(mm.password, "password")
+        mm.validOpsHome = startField(mm.opsHome, "opsHome")
+        mm.validSchema = startField(mm.schema, "schema")
+        mm.validURL = startField(mm.url, "url")
+        mm.validRunId = startField(mm.runId, "runId")
+        mm.validRunComment = startField(mm.runComment, "runComment")
+        saveFields()
+        checkAllFields()
+        log.debug("all fields have been checked - result is ${mm.allFieldsValid} and RunId is ${mm.validRunId}")
+        addListeners()
+        if (mm.allFieldsValid) {
+            initDatabase()
+        }
     }
 
     def buttonViewAction = { ActionEvent event ->
@@ -191,7 +216,7 @@ class MainController {
 
     def buttonCollectAction = { ActionEvent event ->
         log.debug("collection requested")
-        mv.collectButton.setEnabled(false)
+        mv.buttonCollect.setEnabled(false)
         runit.runIt(collectTask)
     }
 
@@ -201,10 +226,10 @@ class MainController {
         db.setRunId(mm.savedRunId, mm.savedRunComment)
         OpsReader ops = new OpsReader()
         ops.processFiles(mm.savedOpsHome, mm.savedRunId)
-        mm.getSequence()
+        setupSequence()
         SwingUtilities.invokeLater { ->
             log.debug("back from collection - reeneablling collect button")
-            mv.collectButton.setEnabled(true)
+            mv.buttonCollect.setEnabled(true)
             mm.message.setText("")
         }
     }
@@ -215,83 +240,28 @@ class MainController {
         sc.init()
     }
 
-
     def radioAction = { ActionEvent event ->
 
     }
 
-    Runnable validatorTask = () -> {
-        log.debug("first line of the validator task")
-        if (SwingUtilities.isEventDispatchThread()) {
-            log.error("still running under the EDT - returning")
-            return
-        }
-        log.trace("about to run the database validate")
-        mm.verifyPassed = false
-
-        mm.verifyPassed = db.validateFields(mm.userid.getValue(),
-                mm.password.getValue(),
-                mm.url.getValue(),
-                mm.schema.getValue(),
-                mm.message)
-
-        log.trace("database validate returned ${mm.verifyPassed}")
-        if (mm.verifyPassed) {
-            mm.currentStage = MainModel.ProcessStage.COLLECTING
-            mv.saveValues.setEnabled(false)
-            mv.collectButton.setEnabled(true)
-        } else {
-            mm.currentStage = MainModel.ProcessStage.LOOKING
-            mv.saveValues.setEnabled(false)
-        }
-    }
-
-    Runnable saveValues = () -> {
+    Runnable buttonSaveInner() {
         log.debug("all fields valid - saving the values")
-        saver.putBaseString("userid", mm.userid.getValue())
-        saver.putBaseString("password", mm.password.getValue())
-        saver.putBaseString("url", mm.url.getValue())
-        saver.putBaseString("schema", mm.schema.getValue())
-        saver.putBaseString("opsHome", mm.opsHome.getValue())
-        if (mm.validRunId) {
-            saver.putBaseString("runId", mm.runId.getValue())
-        }
-        if (mm.verifyPassed) {
-            if (!mm.runId.getValue().isBlank()) {
-                saver.putBaseString("runId", mm.runId.getValue())
-            }
-            if (!mm.runComment.getValue().isBlank()) {
-                saver.putBaseString("runComment", mm.runComment.getValue())
-            }
-            db.initialize(mm.url.getValue(), mm.schema.getValue(), mm.userid.getValue(), mm.password.getValue())
-            saver.writeValues()
-            if (mm.runId.getValue().isBlank()) {
-                mm.currentStage = MainModel.ProcessStage.RUN_READY
-            } else {
-                mm.currentStage = MainModel.ProcessStage.COLLECTING
-            }
-        }
-        if (SwingUtilities.isEventDispatchThread()) {
-            mv.saveValues.setEnabled(false)
-        } else {
-            SwingUtilities.invokeLater {
-                mv.saveValues.setEnabled(false)
-            }
-        }
+        saver.putBaseString("userid", mm.savedUserid)
+        saver.putBaseString("password", mm.savedPw)
+        saver.putBaseString("url", mm.savedURL)
+        saver.putBaseString("schema", mm.savedSchema)
+        saver.putBaseString("opsHome", mm.savedOpsHome)
+        saver.putBaseString("runId", mm.savedRunId)
+        saver.putBaseString("runComment", mm.savedRunComment)
+        saver.writeValues()
+        initDatabase()
+        return null
     }
 
     def buttonSaveValuesAction = { ActionEvent event ->
         log.debug("save values button pressed")
-        runit.runIt(validatorTask)
-        mm.savedUserid = mm.userid.getValue()
-        mm.savedPw = mm.password.getValue()
-        mm.savedSchema = mm.schema.getValue()
-        mm.savedOpsHome = mm.opsHome.getValue()
-        mm.savedURL = mm.url.getValue()
-        mm.savedRunId = mm.runId.getValue()
-        mm.savedRunComment = mm.runComment.getValue()
-        mv.saveValues.setEnabled(false)
-        runit.runIt(saveValues)
+        saveFields()
+        runit.runIt(buttonSaveInner())
     }
 
     def selectHomeAction = { ActionEvent ->
@@ -314,21 +284,22 @@ class MainController {
 
     Runnable verifyDatabase = () -> {
         log.debug("verifying database values now")
-        boolean goodValues = db.verifyConnect(mm.userid.getValue(),
-                mm.password.getValue(), mm.url.getValue())
+        boolean goodValues = db.verifyConnect(mm.savedUserid,
+                mm.savedPw,
+                mm.savedURL,
+                new Message())
         if (goodValues) {
             log.debug("values for database all check out")
-            SwingUtilities.invokeLater { ->
-                mm.verifyPassed = true
-                mm.currentStage = MainModel.ProcessStage.SAVEREADY
-                mv.saveValues.setEnabled(true)
-            }
+            mm.verifyPassed = true
+        } else {
+            mm.verifyPassed = false
         }
     }
 
     public void checkChange(String fieldName) {
         log.debug("checking change - current stage is ${mm.currentStage} and AllValid is ${mm.allFieldsValid}")
         if (fieldName.equals("runComment")) {
+            mm.savedRunComment = mm.runComment.getValue()
             return
             // no need to check anything when runcomment changes
         }
@@ -340,17 +311,37 @@ class MainController {
             case MainModel.ProcessStage.LOOKING:
                 // looking for the data to be entered
                 if (mm.allFieldsValid) {
-                    runit.runIt(verifyDatabase)
+                    runit.runIt(initDatabase())
                 }
                 break
             case MainModel.ProcessStage.COLLECTING:
-            case MainModel.ProcessStage.SAVEREADY:
                 if (fieldName.equals("runid")) {
                     saver.putBaseString("runId", mm.runId.getValue())
+                    runit.runIt(setupSequence())
                 }
                 break
             default:
                 log.error("dropped down after field change - whey?")
         }
+    }
+
+    /**
+     * must be called in the background thread
+     * read the count of sequences*/
+    Runnable setupSequence() {
+        saver.putBaseString("runId", mm.savedRunId)
+        saver.putBaseString(("runComment"), mm.savedRunComment)
+        mm.nextSequence = db.getSequence(mm.savedUserid, mm.savedPw, mm.savedURL, mm.savedSchema, mm.savedRunId)
+        Integer seqCount = db.getSequenceCount(mm.savedUserid, mm.savedPw, mm.savedURL, mm.savedSchema, mm.savedRunId)
+        mv.setSequenceText(mm.nextSequence.toString())
+        if (seqCount > 0) {
+            log.debug("sequence count is > 0 (${seqCount} - enabling views")
+            mm.viewReady = true
+        } else {
+            mm.viewReady = false
+        }
+        mv.changeViewButton(mm.viewReady)
+        mv.changeExportButton(mm.viewReady)
+        return null
     }
 }

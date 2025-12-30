@@ -93,9 +93,10 @@ class DatabaseProcess extends AbstractDatabase {
      * @param userid the userid
      * @param pw the password
      * @param url the URL which should start with "jdbc:h2:"
+     * @param message a message to be set based on success or failure
      * @return true if the connection succeeds
      */
-    boolean verifyConnect(String userid, String pw, String url) {
+    boolean verifyConnect(String userid, String pw, String url, Message message) {
         boolean retValue = false
         log.debug("verify that we can connect via userid ${userid} and url ${url}")
         Connection conn = null
@@ -104,8 +105,10 @@ class DatabaseProcess extends AbstractDatabase {
             if (conn != null) {
                 log.debug("connection succeeded")
                 retValue = true
+                message.setText("", Message.Level.INFO)
             }
         } catch (Exception e) {
+            message.setText(e.getMessage(), Message.Level.ERROR)
             log.error("Connection failed - exception was ${e.getMessage()}", e)
         } finally {
             if (conn != null) {
@@ -117,13 +120,14 @@ class DatabaseProcess extends AbstractDatabase {
 
 /**
  * Returns TRUE is the fields represent a valid database connection
- * @param userid
- * @param pw
  * @param url
  * @param schema
+ * @param userid
+ * @param password
+ * @param message where a response message will be set
  * @return true if the fields result in a valid database connection
  */
-    boolean validateFields(String userid, String pw, String url, String schema, Message returnMessage) {
+    boolean validateFields(String url, String schema, String userid, String password, Message returnMessage) {
         log.debug("now in the validator")
         boolean returnValue = false // return false if there are any issues
         Connection conn = null
@@ -133,7 +137,7 @@ class DatabaseProcess extends AbstractDatabase {
             if (!url.startsWith("jdbc:h2:")) {
                 return false
             }
-            conn = DriverManager.getConnection(url, userid, pw)
+            conn = DriverManager.getConnection(url, userid, password)
             if (conn != null) {
                 log.trace("got a good connection with that URL, userid and password")
                 PreparedStatement schemaStatement = conn.prepareStatement(SCHEMA_TEST)
@@ -149,7 +153,7 @@ class DatabaseProcess extends AbstractDatabase {
                         PreparedStatement stmt = conn.prepareStatement(CREATE_SCHEMA + schema.toString())
                         stmt.execute()
                     } else if (matchCount == 1) {
-                        log.trace("schema already present - checking for tables with schema ${schema} and sql ${TABLE_TEST}")
+                        log.trace("schema already present - checking for tables with schema ${schema} andl ${TABLE_TEST}")
                         PreparedStatement stmt = conn.prepareStatement(TABLE_TEST)
                         stmt.setString(1, schema.toUpperCase())
                         ResultSet rs = stmt.executeQuery()

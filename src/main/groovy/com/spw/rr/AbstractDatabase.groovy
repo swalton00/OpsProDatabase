@@ -18,10 +18,11 @@ abstract class AbstractDatabase {
     /**
      * Initialize the Mybatis environment
      * @param url
+     * @param schema
      * @param userid
      * @param password
      */
-    void initialize(String url, String schema, String userid, String password) {op
+    void initialize(String url, String schema, String userid, String password) {
         log.debug("AbstractDatabase initializing")
         String resource = "mybatis-config.xml";
         Properties props = new Properties()
