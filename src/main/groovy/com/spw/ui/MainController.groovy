@@ -317,6 +317,7 @@ class MainController {
             case MainModel.ProcessStage.COLLECTING:
                 if (fieldName.equals("runid")) {
                     saver.putBaseString("runId", mm.runId.getValue())
+                    mm.savedRunId = mm.runId.getValue()
                     runit.runIt(setupSequence())
                 }
                 break
