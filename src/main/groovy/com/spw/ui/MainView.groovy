@@ -41,6 +41,7 @@ class MainView implements DocumentListener, FocusListener{
     JButton buttonView = new JButton("View Data")
     JButton buttonExport = new JButton("Export Data")
     JButton buttonOpsHome = new JButton("Select Operations Home")
+    JButton buttonReset = new JButton("Enable reentry of settings")
 
     JPanel messagePanel
 
@@ -169,7 +170,11 @@ class MainView implements DocumentListener, FocusListener{
         buttonSave.setToolTipText("Press this button to save the values and open the database")
         buttonSave.setEnabled(false)
         buttonSave.addActionListener(mc.buttonSaveValuesAction)
-        contentPanel.add(buttonSave, "left, wrap")
+        contentPanel.add(buttonSave, "left")
+        buttonReset.setToolTipText("Press to enable editing input settings - restart will be required")
+        buttonReset.setEnabled(false)
+        buttonReset.addActionListener(mc.buttonResetAction)
+        contentPanel.add(buttonReset, "right, wrap")
 
         JSeparator sep1 = new JSeparator()
         sep1.setPreferredSize(new Dimension(100, 5))
@@ -308,6 +313,12 @@ class MainView implements DocumentListener, FocusListener{
         changeButton(buttonView, enable)
     }
 
+    public void changeResetButton(boolean enable) {
+        log.debug("setting reset button enabled status to ${enable}")
+        changeButton(buttonReset, enable)
+    }
+
+
     public void changeExportButton(boolean enable) {
         log.debug("Changing Export button to enabled ${enable}")
         changeButton(buttonExport, enable)
@@ -351,7 +362,7 @@ class MainView implements DocumentListener, FocusListener{
 
 
 
-    private void textChangeInner(DocumentEvent e, ObservableString field, String newValue) {
+    private static void textChangeInner(DocumentEvent e, ObservableString field, String newValue) {
         if (field.getValue().equals(newValue)) {
             return
         }

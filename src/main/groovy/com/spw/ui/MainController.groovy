@@ -10,6 +10,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import javax.swing.JFileChooser
+import javax.swing.JOptionPane
 import javax.swing.SwingUtilities
 import java.awt.event.ActionEvent
 
@@ -103,11 +104,6 @@ class MainController {
         mm.schema.addPropertyChangeListener {
             mm.validSchema = checkOneField(mm.schema)
             checkAllFields()
-            if (mm.currentStage.equals(MainModel.ProcessStage.SAVEREADY)) {
-                mv.buttonCollect.setEnabled(true)
-                mv.buttonSave.setEnabled(false)
-                mm.currentStage = MainModel.ProcessStage.COLLECTING
-            }
         }
         mm.url.addPropertyChangeListener {
             String temp = mm.url.getValue()
@@ -158,9 +154,10 @@ class MainController {
                     mm.savedSchema,
                     mm.savedUserid,
                     mm.savedPw,
-                    new Message()
+                    mm.message
             )  // complete database initialization
             mv.enableEntryFields(false)
+            mv.changeResetButton(true)
             mv.changeSaveButton(false)
             if (mm.validRunId) {
                 log.debug("Setting current stage to Collecting")
@@ -181,7 +178,7 @@ class MainController {
         mv = new MainView(this, mm)
         mm.setup()
         saver.init()
-        mv.start()
+
         mm.validUserid = startField(mm.userid, "userid")
         mm.validPassword = startField(mm.password, "password")
         mm.validOpsHome = startField(mm.opsHome, "opsHome")
@@ -189,6 +186,7 @@ class MainController {
         mm.validURL = startField(mm.url, "url")
         mm.validRunId = startField(mm.runId, "runId")
         mm.validRunComment = startField(mm.runComment, "runComment")
+        mv.start()
         saveFields()
         checkAllFields()
         log.debug("all fields have been checked - result is ${mm.allFieldsValid} and RunId is ${mm.validRunId}")
@@ -211,7 +209,35 @@ class MainController {
         log.debug("received an exit Event")
         runit.runIt(writeProperties)
         SwingUtilities.invokeLater { System.exit(0) }
+    }
 
+    // Note: should already be on EDT
+    def buttonResetAction = { ActionEvent event ->
+        log.debug("got a request to reenable the entry fields")
+        JOptionPane option = new JOptionPane("Resetting will require a restart - are you sure?")
+        Object[] options = ["Reset", "Cancel"]
+        Object selectedValue = JOptionPane.showOptionDialog(mv.mainFrame,
+                "Resetting will require a restart - are you sure?",
+                "Reset Question",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[1]
+        )
+        if (selectedValue == 0) {
+            // chose yes to do it
+            mv.enableEntryFields(true)
+            mv.changeSaveButton(true)
+            mv.changeResetButton(false)
+            mv.changeViewButton(false)
+            mv.changeCollectButton(false)
+            mm.currentStage = MainModel.ProcessStage.RESET_VALUES
+            log.debug("current stage is now RESET_VALUES")
+        } else {
+                log.debug("skipping reset - cancel option chosen")
+                return
+        }
     }
 
     def buttonCollectAction = { ActionEvent event ->
@@ -240,12 +266,14 @@ class MainController {
         sc.init()
     }
 
-    def radioAction = { ActionEvent event ->
-
-    }
-
     Runnable buttonSaveInner() {
-        log.debug("all fields valid - saving the values")
+        log.debug("all fields valid - saving the values - current stage is ${mm.currentStage}")
+        verifyDatabase()
+        if (!mm.verifyPassed) {
+            log.debug("quitting button save as verify did not pass")
+            return
+        }
+        saveFields()
         saver.putBaseString("userid", mm.savedUserid)
         saver.putBaseString("password", mm.savedPw)
         saver.putBaseString("url", mm.savedURL)
@@ -254,13 +282,16 @@ class MainController {
         saver.putBaseString("runId", mm.savedRunId)
         saver.putBaseString("runComment", mm.savedRunComment)
         saver.writeValues()
+        if (mm.currentStage == MainModel.ProcessStage.RESET_VALUES) {
+            log.debug("restarting after values reset")
+            System.exit(0)
+        }
         initDatabase()
         return null
     }
 
     def buttonSaveValuesAction = { ActionEvent event ->
         log.debug("save values button pressed")
-        saveFields()
         runit.runIt(buttonSaveInner())
     }
 
@@ -279,18 +310,21 @@ class MainController {
         } else {
             log.debug("selection was canceled ")
         }
-
     }
 
     Runnable verifyDatabase = () -> {
         log.debug("verifying database values now")
-        boolean goodValues = db.verifyConnect(mm.savedUserid,
-                mm.savedPw,
-                mm.savedURL,
-                new Message())
+        boolean goodValues = db.verifyConnect(mm.userid.getValue(),
+                mm.password.getValue(),
+                mm.url.getValue(),
+                mm.message)
         if (goodValues) {
             log.debug("values for database all check out")
             mm.verifyPassed = true
+            if (mm.currentStage == MainModel.ProcessStage.RESET_VALUES) {
+                log.debug("now looking for all good fields in reset - enabling save")
+                mv.changeSaveButton(true)
+            }
         } else {
             mm.verifyPassed = false
         }
@@ -306,7 +340,10 @@ class MainController {
 
         switch (mm.currentStage) {
             case MainModel.ProcessStage.INITIAL:
-                // ignore everything while initializing
+                if (mm.allFieldsValid) {
+                    log.debug("all fields now valid -- enabling save")
+                    mv.changeSaveButton(true)
+                }
                 break
             case MainModel.ProcessStage.LOOKING:
                 // looking for the data to be entered
@@ -319,6 +356,12 @@ class MainController {
                     saver.putBaseString("runId", mm.runId.getValue())
                     mm.savedRunId = mm.runId.getValue()
                     runit.runIt(setupSequence())
+                }
+                break
+            case MainModel.ProcessStage.RESET_VALUES :
+                if (mm.allFieldsValid) {
+                    log.debug("all fields valid - now verifying database")
+                    runit.runIt(verifyDatabase)
                 }
                 break
             default:

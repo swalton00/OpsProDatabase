@@ -60,10 +60,7 @@ class MainModel {
     ObservableString runComment = new ObservableString("")
 
     Message message = new Message()
-
-    String priorValue
     String newValue
-    Boolean valueChanged
 
     /*
             five stages
@@ -73,7 +70,6 @@ class MainModel {
                 4. COLLECTING after enbaling dataCollect
                 5. RESET_VALUES renabling entry fields for new values (requires restart)
      */
-
     public enum ProcessStage {
         INITIAL, LOOKING, RUN_READY, COLLECTING, RESET_VALUES
     }
@@ -81,11 +77,8 @@ class MainModel {
     ProcessStage currentStage = ProcessStage.INITIAL
     Integer sequnceCount = 0
 
-
     public MainModel() {
     }
-
-
 
     String checkNotNull(String key) {
         String temp = saver.getBaseString(key)
@@ -99,28 +92,6 @@ class MainModel {
     void setup() {
         log.trace("setup in MainModel is now complete")
     }
-
-
-    /**
-     * Inner cheeck of the values of runId - is it ready to enable the Collect button?
-     *    MUST be run on the UI thread
-     */
-    Runnable innerCheckRun = () ->  {
-       /* if (!runId.getText().isBlank()) {
-            log.debug("runId field is non-blank - ready to move to next stage")
-            currentStage = ProcessStage.COLLECTING
-            collectButton.setEnabled(true)
-            message.setText("", Message.Level.INFO)
-            savedRunId = runId.getText()
-            savedRunComment = runComment.getText()
-            taskRunner.runIt(getSequence)
-        } else {
-            message.setText("Enter a runid to enable collecting data", Message.Level.INFO)
-            currentStage = ProcessStage.RUN_READY
-        }*/
-    }
-
-
 }
 
 

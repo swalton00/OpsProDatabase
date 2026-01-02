@@ -1,31 +1,18 @@
 Bugs to fix
-    1. save size and location of ViewTable and restore on start up
-    2. compute width of columns and set preferred size of each
-    3. compute max size of each row and set rowHeight of each
+    3. compute width of columns and set preferred size of each
+    4. compute max size of each row and set rowHeight of each
 
-1. Add a Properties service
-    a. save properties file in user home location
-    b. with add, get and save methods
-2. Add an AbstractFrame class extending JFrame
-    a. add A Swing Listener for move and resize
-    b. when moved, save new location properties (under correct thread)
-    c. when resized, save new size
-3. Implement PropertiesListener in MainModel
-    a. validate values, enable buttons when all data present
-4. add buttons (menu items?) for views
-    a. display view
-    b. export csv of data
-    c. views of:
-        1) cars by locations
-        2) locations with cars
-        3) others?
-5. Add a new view type: Moves by car
-    a. show list of cars (with type) plus number of moves
-    b. option to show only cars that moved
-6. Move "Set OpsPro Home" up to save values
-7. Add a new Save option - profiles
-    a. Show list of profiles
-    b. Profile includes: Schema, Comment
-    c. Add parameter "Schema" to every SQL
-        1) Reference schema as pre-execution parameter ("${}")
-    d. New set of views to compare results between profile entries
+Add
+    1.. Move "Set OpsPro Home" up to save values
+    2. Add a new setting - profiles
+        a. Show list of profiles
+        b. Profile includes: RunId
+        c. Add parameter "runId" to every SQL
+            1) Reference runid as pre-execution parameter ("${}")
+        d. New set of views to compare results between profile entries
+    3. Add car type to car (view by cars only)
+    4. New selection: View by car type
+    5. New selection: select (multiple selections) list by selected car type(s)
+    6. New selection: view by load
+    7. New selection: select (multiple selections) list by load(s)
+    8. Load status changed (for car views)
