@@ -1,7 +1,6 @@
 package com.spw.ui
 
 
-import com.spw.utility.OpDialog
 import com.spw.utility.RunTasks
 import com.spw.view.RowElement
 import com.spw.view.ViewCar
@@ -14,7 +13,6 @@ import com.spw.view.ViewTrack
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import javax.swing.JDialog
 import javax.swing.JRadioButton
 import javax.swing.event.ListSelectionEvent
 import java.awt.Window
@@ -63,12 +61,12 @@ class SelectController {
         }
     }
 
-    def returnAction = { ActionEvent e ->
+    def buttonReturnAction = { ActionEvent e ->
         log.debug("got a return request")
         sv.viewDialog.setVisible(false)
     }
 
-    def exportAction = { ActionEvent e ->
+    def buttonExportAction = { ActionEvent e ->
         log.debug("got an export request")
     }
 
@@ -108,7 +106,7 @@ class SelectController {
         tableController.init()
     }
 
-    def viewAction = { ActionEvent ->
+    def buttonViewAction = { ActionEvent ->
         log.debug("got a view request")
         //first capture the options,
         //  next switch to background thread
@@ -121,7 +119,7 @@ class SelectController {
             if (sm.rbAllCars.isSelected()) {
                 parameters.carSelect = ViewParameter.CarSelect.ALL
             } else if (sm.rbMovedCars.isSelected()) {
-                parameters.carSelect = ViewParameter.CarSelect.MOVED
+                 parameters.carSelect = ViewParameter.CarSelect.MOVED
             } else if (sm.rbSpecific.isSelected()) {
                 parameters.carSelect = ViewParameter.CarSelect.SPECIFIC
                 List<ViewCar> selCars = sm.carBox.getSelectedValuesList()
@@ -134,33 +132,42 @@ class SelectController {
             }
         } else {
             parameters.runType = ViewElement.RunType.TRACK
+            log.debug("XXXX -run type TRACK")
             if (sm.rbLocsAll.isSelected()) {
                 parameters.locSelect = ViewParameter.LocSelect.ALL
+                log.debug("All locations selected")
             } else if (sm.rbLocsWith.isSelected()) {
                 parameters.locSelect = ViewParameter.LocSelect.WITH
+                log.debug("With selected")
             } else if (sm.rbLocsMoved.isSelected()) {
                 parameters.locSelect = ViewParameter.LocSelect.MOVED
+                log.debug("Moved selected")
             } else if (sm.rbLocsSpecific.isSelected()) {
                 parameters.locSelect = ViewParameter.LocSelect.SPECIFIC
+                log.debug("specific selected")
                 parameters.idList = new ArrayList<>()
                 boolean onlyLocs = false
                 if (sm.trkBox.isSelectionEmpty()) {
                     // no tracks selected - use all from location
+                    log.debug("no tracks selected -- all at that location used")
                     List<ViewLoc> selLocs = sm.locBox.getSelectedValuesList()
                     selLocs.each { loc ->
                         loc.tracks.each { trk ->
                             parameters.idList.add(trk.trkId)
                         }
+                        log.debug("trkBox empty - selected locations were: ${parameters.idList}")
                     }
                 } else {
                     // use only selected tracks
+                    log.debug(" use only selected tracks")
                     List<ViewTrack> trks = sm.trkBox.getSelectedValuesList()
                     trks.each {
                         parameters.idList.add(it.trkId)
                     }
+                    log.debug("use only selected - ${parameters.idList}")
                 }
             } else {
-                log.error("no selection amoung radio buttons for Location type")
+                log.error("no selection within radio buttons for Location type")
             }
         }
         runner.runIt(viewActionBackground)

@@ -1,6 +1,6 @@
 Bugs to fix
-    3. compute width of columns and set preferred size of each
-    4. compute max size of each row and set rowHeight of each
+    1. compute width of columns and set preferred size of each
+    2. compute max size of each row and set rowHeight of each
 
 Add
     1.. Move "Set OpsPro Home" up to save values
@@ -16,3 +16,4 @@ Add
     6. New selection: view by load
     7. New selection: select (multiple selections) list by load(s)
     8. Load status changed (for car views)
+    9. Add a button to clear the datadata for a runId

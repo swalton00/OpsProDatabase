@@ -124,18 +124,22 @@
             r.carid   AS carid
         FROM
             tracks AS T
-        LEFT OUTER JOIN
+        INNER JOIN
             locations AS l
         ON
             t.parentid = l.id
+        and t.runid = l.runid
         LEFT OUTER JOIN
             run_locs AS r
         ON
             r.trkid = t.trkid
+        and (r.runid = t.runid or
+        r.runid is null)
         LEFT OUTER JOIN
             cars c
         ON
             c.carid = r.carid
+        and c.runid = t.runid
         WHERE
             t.runid = #{runId}
             AND l.runid = t.runid

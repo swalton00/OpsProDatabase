@@ -2,28 +2,19 @@ package com.spw.ui
 
 import com.spw.utility.OpDialog
 import com.spw.utility.PropertySaver
-import com.spw.view.ViewCar
-import com.spw.view.ViewLoc
-import com.spw.view.ViewTrack
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import javax.swing.BorderFactory
 import javax.swing.ButtonGroup
-import javax.swing.DefaultListModel
-import javax.swing.JDialog
-import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.JPanel
 import net.miginfocom.swing.MigLayout
 
-import javax.swing.JRadioButton
-import javax.swing.JScrollBar
 import javax.swing.JScrollPane
 import javax.swing.ListSelectionModel
 import javax.swing.border.Border
-import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.Window;
@@ -142,9 +133,9 @@ class SelectView {
         viewDialog.add(locsPanel, "wrap")
 
         viewDialog.add(sm.buttonReturn)
-        sm.buttonReturn.addActionListener(sc.returnAction)
-        sm.buttonExport.addActionListener(sc.exportAction)
-        sm.buttonView.addActionListener(sc.viewAction)
+        sm.buttonReturn.addActionListener(sc.buttonReturnAction)
+        sm.buttonExport.addActionListener(sc.buttonExportAction)
+        sm.buttonView.addActionListener(sc.buttonViewAction)
         viewDialog.add(sm.buttonExport, "center")
         viewDialog.add(sm.buttonView, "wrap")
 
