@@ -2,6 +2,12 @@ Bugs to fix
     1. compute width of columns and set preferred size of each
     2. compute max size of each row and set rowHeight of each
 
+State:
+    1. car type added, next
+    2. upgrade database code
+    3. add table to create sql
+    4. add carType to views by car
+
 Add
     1.. Move "Set OpsPro Home" up to save values
     2. Add a new setting - profiles
