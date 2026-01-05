@@ -26,4 +26,10 @@ public interface MapperInterface {
      public Location getLocation(Location location);
 
      public void insertLocation(Location location);
+
+     public void insertRunIdent(RunIdent ident);
+
+     public void insertCarType(CarType carType);
+
+     public List<CarType> listCarTypes(String runId);
 }

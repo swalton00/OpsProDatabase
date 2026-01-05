@@ -12,4 +12,5 @@ class Car {
     String carSecLocId
     String carLoad
     String runId
+    int carTypeId
 }
