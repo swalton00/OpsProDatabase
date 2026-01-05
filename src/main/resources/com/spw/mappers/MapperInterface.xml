@@ -42,14 +42,16 @@
     <update id="mergeCar">
         MERGE
             INTO
-            cars ( carid, roadname, roadnumber, runid, carLoad )
+            cars ( carid, roadname, roadnumber, runid, carLoad, CAR_TYPE )
         KEY ( runId, CarId) VALUES
         (
         #{carId},
         #{roadName},
         #{roadNumber},
         #{runId},
-        #{carLoad}
+        #{carLoad},
+        #{carTypeId}
+
         )
     </update>
     <insert id="insertRunLoc">
@@ -143,4 +145,34 @@
             runid = #{runId}
         AND xmlid = #{xmlId}
     </select>
-</mapper>
+    <insert id="insertRunIdent" parameterType="RunIdent" useGeneratedKeys="true">
+        INSERT INTO Run_Seq
+        (
+            run_id,
+            seq_num,
+            run_comment
+        ) VALUES (
+            #{runId},
+            #{seqNo},
+            #{seqNo}
+        )
+    </insert>
+    <insert id="insertCarType" parameterType="CarType" useGeneratedKeys="true">
+        INSERT INTO car_type
+        (
+            RUN_ID,
+            car_type
+        ) VALUES (
+            #{runId},
+            #{carType}
+          )
+    </insert>
+    <select id="listCarTypes" resultType="CarType" parameterType="String">
+        SELECT
+            ID,
+            RUN_ID,
+            CAR_TYPE
+        FROM CAR_TYPE
+        WHERE RUN_ID = #{paramter}
+        ORDER BY ID
+    </select></mapper>

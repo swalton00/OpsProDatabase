@@ -1,7 +1,9 @@
 package com.spw.rr
 
+import com.spw.mappers.CarType
 import com.spw.mappers.MapperInterface
 import com.spw.mappers.RunId
+import com.spw.mappers.RunIdent
 import com.spw.mappers.RunLoc
 import com.spw.utility.ApplyResources
 import com.spw.utility.Message
@@ -167,10 +169,10 @@ class DatabaseProcess extends AbstractDatabase {
                     if (tableCount == 0) {
                         returnValue = createTables(conn, schema)
                         log.debug("create tables returned ${returnValue}")
-                    } else if (tableCount != 5) {
+          /*          } else if (tableCount != 5) {
                         log.error("got an incorrect table count - value was ${tableCount}")
                         throw new RuntimeException("Incorrect table count in schema ${schema} - count is ${tableCount}")
-                    } else {
+             */       } else {
                         log.debug("all looks good - validated!")
                         returnValue = true
                     }
@@ -311,5 +313,60 @@ class DatabaseProcess extends AbstractDatabase {
             log.debug("closing the session now")
             session.close()
         }
+    }
+
+    void insertRunIdent(RunIdent runIdent) {
+        log.debug("writing the runIdent ${runIdent}")
+        SqlSession session = null
+        try {
+            session = getSession()
+            MapperInterface mapper = session.getMapper(MapperInterface.class)
+            mapper.insertRunIdent(runIdent)
+        } catch (Exception e) {
+            log.error("Exception writing the runIdent", e)
+        } finally {
+            log.debug("closing the session")
+            if (session != null) {
+                session.close()
+            }
+        }
+    }
+
+    CarType insertCarType(CarType carType) {
+        log.debug("writing the carTYpe ${carType}")
+        SqlSession session = null
+        try {
+            session = getSession()
+            MapperInterface mapper = session.getMapper(MapperInterface.class)
+            mapper.insertCarType(carType)
+        } catch (Exception e) {
+            log.error("Exception writing the carType", e)
+        } finally {
+            log.debug("closing the session")
+            if (session != null) {
+                session.close()
+            }
+        }
+        return carType
+    }
+
+
+    List<CarType> listCarTypes(String runId) {
+        log.debug("getting a list of carTypes for runId ${runId}")
+        SqlSession session = null
+        List<CarType> retVal = null
+        try {
+            session = getSession()
+            MapperInterface mapper = session.getMapper(MapperInterface.class)
+            retVal = mapper.listCarTypes(runId)
+        } catch (Exception e) {
+            log.error("Exception retrieving the list of carTypes", e)
+        } finally {
+            log.debug("closing the session")
+            if (session != null) {
+                session.close()
+            }
+        }
+        return retVal
     }
 }

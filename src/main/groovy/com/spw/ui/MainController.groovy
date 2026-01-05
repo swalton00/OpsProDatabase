@@ -150,25 +150,29 @@ class MainController {
                     mm.savedSchema,
                     mm.savedUserid,
                     mm.savedPw)
-            db.validateFields(mm.savedURL,
+            mm.verifyPassed = db.validateFields(mm.savedURL,
                     mm.savedSchema,
                     mm.savedUserid,
                     mm.savedPw,
                     mm.message
             )  // complete database initialization
-            mv.enableEntryFields(false)
-            mv.changeResetButton(true)
-            mv.changeSaveButton(false)
-            if (mm.validRunId) {
-                log.debug("Setting current stage to Collecting")
-                mm.currentStage = MainModel.ProcessStage.COLLECTING
-                mv.changeCollectButton(true)
-                setupSequence()
-            } else {
-                log.debug("setting current stage to RUN_READY as runId is ${mm.runId.getValue()}")
-                mm.currentStage = MainModel.ProcessStage.RUN_READY
-                mm.message.setText("Enter a RunId to enable Collecting", Message.Level)
+            // will check further for a good database
+            if (mm.verifyPassed) {
+                mv.enableEntryFields(false)
+                mv.changeResetButton(true)
+                mv.changeSaveButton(false)
+                if (mm.validRunId) {
+                    log.debug("Setting current stage to Collecting")
+                    mm.currentStage = MainModel.ProcessStage.COLLECTING
+                    mv.changeCollectButton(true)
+                    setupSequence()
+                } else {
+                    log.debug("setting current stage to RUN_READY as runId is ${mm.runId.getValue()}")
+                    mm.currentStage = MainModel.ProcessStage.RUN_READY
+                    mm.message.setText("Enter a RunId to enable Collecting", Message.Level)
+                }
             }
+
         }
         return null
     }
@@ -251,7 +255,7 @@ class MainController {
         mm.message.setText("Collecting data")
         db.setRunId(mm.savedRunId, mm.savedRunComment)
         OpsReader ops = new OpsReader()
-        ops.processFiles(mm.savedOpsHome, mm.savedRunId)
+        ops.processFiles(mm.savedOpsHome, mm.savedRunId, mm.runComment.getValue())
         setupSequence()
         SwingUtilities.invokeLater { ->
             log.debug("back from collection - reeneablling collect button")

@@ -16,4 +16,6 @@ Add
     6. New selection: view by load
     7. New selection: select (multiple selections) list by load(s)
     8. Load status changed (for car views)
-    9. Add a button to clear the datadata for a runId
+    9. Add a button to clear the data for a runId
+    10. New table with runid, runComment, and time of collection
+    11. New table DB_Version with major, minor and table count

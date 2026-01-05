@@ -1,5 +1,7 @@
 package com.spw.rr
 
+import com.spw.mappers.RunId
+import com.spw.mappers.RunIdent
 import com.spw.ui.MainModel
 import com.spw.utility.PropertySaver
 import org.slf4j.Logger
@@ -13,14 +15,19 @@ class OpsReader {
     static final String LOCATIONS_FILE = 'OperationsLocationRoster.xml'
 
 
-    void processFiles(String dataHome, String runId) {
+    void processFiles(String dataHome, String runId, String runComment) {
         log.debug("setting up to process - home is ${dataHome}")
         ParseFile parsedlocations = new ParseFile(dataHome, LOCATIONS_FILE)
         ParseFile parsedCars = new ParseFile(dataHome, CAR_FILE)
         DoTracks locs = new DoTracks(parsedlocations.getParsed())
-        DoCars cars = new DoCars(parsedCars.getParsed())
+        DoCars cars = new DoCars(parsedCars.getParsed(), runId)
         try {
             Integer currentSequence = db.getCurrentSequence()
+            RunIdent runIdent = new RunIdent()
+            runIdent.runComment = runComment
+            runIdent.runId = runId
+            runIdent.seqNo = db.getCurrentSequence()
+            db.insertRunIdent(runIdent)
             /* need to do locations first since runLocs will reference Locations */
             ProcessData.doLocations(locs.getLocations(), locs.getTracks(), runId)
             ProcessData.doCars(cars.getCarList(), runId)
