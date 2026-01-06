@@ -33,6 +33,7 @@ class DoCars {
                 newCt.runId = runId
                 newCt.carType = thisType
                 newCt = db.insertCarType(newCt)
+                log.debug("inserted CarType result is ${newCt}")
                 typeHash.put(thisType, newCt)
             }
         }

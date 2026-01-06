@@ -23,5 +23,15 @@ Add
     7. New selection: select (multiple selections) list by load(s)
     8. Load status changed (for car views)
     9. Add a button to clear the data for a runId
+    10. List of runid's with counts
     10. New table with runid, runComment, and time of collection
     11. New table DB_Version with major, minor and table count
+    12. Move Ops_Home & Schema to database (out of properties)
+        a. Reserve Schema "OPS_DB" for use by application
+        b. New Table in schema OPS_DB.HOMES
+            1) Ops_home
+            2) Schema value
+    13. Save now only requires DB, userid and password
+    14. Move display around
+        a. Ops_home and Schema part of new dropdown list
+            1) <NEW> or list existing

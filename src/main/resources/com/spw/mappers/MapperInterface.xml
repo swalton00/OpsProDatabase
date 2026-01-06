@@ -145,7 +145,7 @@
             runid = #{runId}
         AND xmlid = #{xmlId}
     </select>
-    <insert id="insertRunIdent" parameterType="RunIdent" useGeneratedKeys="true">
+    <insert id="insertRunIdent" parameterType="RunIdent">
         INSERT INTO Run_Seq
         (
             run_id,
@@ -157,7 +157,7 @@
             #{seqNo}
         )
     </insert>
-    <insert id="insertCarType" parameterType="CarType" useGeneratedKeys="true">
+    <insert id="insertCarType" parameterType="CarType" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO car_type
         (
             RUN_ID,
