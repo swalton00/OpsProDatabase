@@ -24,9 +24,12 @@ class ViewCellRenderer extends JList<String[]> implements TableCellRenderer {
         if (value instanceof RowElement) {
             resultValue = new String[2]
             if (ViewElement.thisRun.equals(ViewElement.RunType.CAR)) {
+                resultValue = new String[3]
                 resultValue[0] = value.roadName
                 resultValue[1] = value.roadNumber
+                resultValue[2] = value.carType
             } else {
+                resultValue = new String[2]
                 resultValue[0] = value.location
                 resultValue[1] = value.trackName
             }
@@ -36,6 +39,7 @@ class ViewCellRenderer extends JList<String[]> implements TableCellRenderer {
                 resultValue[0] = value.location
                 resultValue[1] = value.trackName + "-" + value.load
             } else {
+                resultValue = new String[2]
                 resultValue = new String[value.carList.size()]
                 int whichElement = 0
                 value.carList.each {

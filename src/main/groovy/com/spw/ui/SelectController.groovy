@@ -127,6 +127,10 @@ class SelectController {
                 selCars.each {
                     parameters.idList.add(it.carId)
                 }
+                if (parameters.idList.size() ==0) {
+                    log.debug("no cars selected for specific view - set to ALL")
+                    parameters.carSelect = ViewParameter.CarSelect.ALL
+                }
             } else {
                 log.error("no selection amoung radio buttons for Cars")
             }
@@ -148,14 +152,19 @@ class SelectController {
                 parameters.idList = new ArrayList<>()
                 boolean onlyLocs = false
                 if (sm.trkBox.isSelectionEmpty()) {
-                    // no tracks selected - use all from location
-                    log.debug("no tracks selected -- all at that location used")
-                    List<ViewLoc> selLocs = sm.locBox.getSelectedValuesList()
-                    selLocs.each { loc ->
-                        loc.tracks.each { trk ->
-                            parameters.idList.add(trk.trkId)
+                    if (sm.locBox.isSelectionEmpty()) {
+                        log.debug("neither tracks nor locations selected - set to all")
+                        parameters.locSelect = ViewParameter.LocSelect.ALL
+                    } else {
+                        // no tracks selected - use all from location
+                        log.debug("no tracks selected -- all at that location used")
+                        List<ViewLoc> selLocs = sm.locBox.getSelectedValuesList()
+                        selLocs.each { loc ->
+                            loc.tracks.each { trk ->
+                                parameters.idList.add(trk.trkId)
+                            }
+                            log.debug("trkBox empty - selected locations were: ${parameters.idList}")
                         }
-                        log.debug("trkBox empty - selected locations were: ${parameters.idList}")
                     }
                 } else {
                     // use only selected tracks

@@ -83,7 +83,7 @@ class ViewTableView {
        //     log.trace("column width for column ${i} is ${rowWidths.getAt(i)}")
             columnModel.getColumn(i).setPreferredWidth((rowWidths.get(i)*WIDTH_MULTIPLIER))
         }
-     //   log.trace("row heigth multiplier is ${HEIGHT_MULTIPLIER}")
+     //   log.trace("row height multiplier is ${HEIGHT_MULTIPLIER}")
         for (i in 0..<model.dataForTable.size()) {
      //       log.trace("row height for row ${i} is ${rowHeights.get(i)}")
             tab.setRowHeight(i, (rowHeights.get(i) * HEIGHT_MULTIPLIER))

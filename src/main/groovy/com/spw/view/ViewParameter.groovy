@@ -4,7 +4,7 @@ class ViewParameter {
     ViewElement.RunType runType = ViewElement.RunType.CAR
     String runId
     public enum CarSelect {
-        ALL, MOVED, SPECIFIC
+        ALL, MOVED, SPECIFIC, CAR_TYPE
     }
 
     public enum LocSelect {

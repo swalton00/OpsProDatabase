@@ -8,6 +8,7 @@ class ViewElement {
     String trkName
     String trkId
     String carId
+    String carType
     String load
     String runId
     Integer sequenceNumber

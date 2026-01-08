@@ -36,7 +36,7 @@ class ViewTableController {
     }
 
     def closeAction = { ActionEvent e ->
-        log.debug("cloeing the table view")
+        log.debug("closing the table view")
         view.thisDialog.setVisible(false)
     }
 

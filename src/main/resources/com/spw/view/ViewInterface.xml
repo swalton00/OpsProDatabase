@@ -5,13 +5,16 @@
 <mapper namespace="com.spw.view.ViewInterface">
     <select id="listViewCars">
         SELECT
-            id,
+            cars.id,
             carid,
+            ct.CAR_TYPE as carType,
             roadname,
             roadnumber,
             carload
         FROM
             cars
+        LEFT OUTER JOIN CAR_TYPE as ct
+        ON cars.CAR_TYPE = ct.ID
         WHERE
             runid = #{runId}
     </select>
@@ -58,6 +61,7 @@
     <resultMap id="rowResults" type="RowElement">
         <id property="id" column="id"/>
         <result property="carId" column="carId"/>
+        <result property="carType" column="carType"/>
         <result property="roadName" column="roadName"/>
         <result property="roadNumber" column="roadNumber"/>
         <collection property="elements" ofType="ViewElement">
@@ -75,6 +79,7 @@
             c.carid as carId,
             roadname,
             roadnumber,
+            ct.CAR_TYPE as carType,
             r.id as rowId,
             r.seq_num as Seq,
             r.trkid as trkId,
@@ -95,6 +100,8 @@
             locations l
         ON
             t.parentId = l.id
+        LEFT OUTER JOIN CAR_TYPE ct
+        ON c.CAR_TYPE = ct.ID
         WHERE
             c.runid = #{runId}
             AND t.runId = c.runId

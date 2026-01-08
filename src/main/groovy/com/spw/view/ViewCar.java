@@ -44,6 +44,7 @@ public class ViewCar {
     int id;
     String roadName;
     String roadNumber;
+    String carType;
     String carLoad;
     String carId;
 
