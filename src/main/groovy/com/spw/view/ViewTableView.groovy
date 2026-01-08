@@ -7,10 +7,13 @@ import net.miginfocom.swing.MigLayout
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import javax.swing.ButtonGroup
 import javax.swing.JDialog
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
+import javax.swing.JRadioButton
+import javax.swing.JRadioButtonMenuItem
 import javax.swing.JScrollPane
 import javax.swing.JTable
 import javax.swing.table.TableCellRenderer
@@ -98,8 +101,16 @@ class ViewTableView {
         thisDialog.setName("table")
         thisDialog.setLayout(new BorderLayout())
         JMenuBar menuBar = new JMenuBar()
-        JMenu fileMenu = new JMenu("File")
-        menuBar.add(fileMenu, "wrap")
+        ButtonGroup sortGroup = new ButtonGroup()
+        JRadioButtonMenuItem byReporting = new JRadioButtonMenuItem("By car number")
+        JRadioButtonMenuItem byType = new JRadioButtonMenuItem("By car type")
+        JMenu sortMenu = new JMenu("Sort by")
+        sortGroup.add(byReporting)
+        sortGroup.add(byType)
+        byType.setSelected(true)
+        sortMenu.add(byReporting)
+        sortMenu.add(byType)
+        menuBar.add(sortMenu)
         JMenuItem fileClose = new JMenuItem("Close", KeyEvent.VK_C)
         menuBar.add(fileClose)
         fileClose.addActionListener(controller.closeAction)

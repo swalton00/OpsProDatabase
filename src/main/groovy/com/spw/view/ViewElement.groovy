@@ -25,7 +25,7 @@ class ViewElement {
             }
             sb.append(trackName)
             if (includeLoad) {
-                sb.append(" - ")
+                sb.append("-")
                 sb.append(load)
             }
         } else {
@@ -41,7 +41,7 @@ class ViewElement {
                     sb.append(it.carId)
                     if (includeLoad) {
                         if (it.load != null) {
-                            sb.append(" - ")
+                            sb.append("-")
                             sb.append(it.load)
                         }
                     }

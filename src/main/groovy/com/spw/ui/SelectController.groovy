@@ -80,7 +80,7 @@ class SelectController {
         List<RowElement> rowData
         if (parameters.runType.equals(ViewElement.RunType.CAR)) {
             ViewElement.setType(ViewElement.RunType.CAR, true, true)
-            tableController.model.columnHeader.add("Car Number")
+            tableController.model.columnHeader.add("Car/Type")
             rowData = vdb.getRowElements(parameters)
         } else {
             ViewElement.setType(ViewElement.RunType.TRACK, true, true)
