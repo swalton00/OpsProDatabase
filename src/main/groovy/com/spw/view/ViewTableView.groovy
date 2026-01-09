@@ -17,8 +17,12 @@ import javax.swing.JRadioButtonMenuItem
 import javax.swing.JScrollPane
 import javax.swing.JTable
 import javax.swing.table.TableCellRenderer
+import javax.swing.table.TableColumn
 import javax.swing.table.TableColumnModel
+import javax.swing.table.TableModel
+import javax.swing.table.TableRowSorter
 import java.awt.BorderLayout
+import java.awt.Component
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.KeyEvent
@@ -33,68 +37,53 @@ class ViewTableView {
     PropertySaver saver = PropertySaver.getInstance()
     JDialog thisDialog
     JTable theTable
-    static final Integer HEIGHT_MULTIPLIER = 22
-    static final Integer WIDTH_MULTIPLIER = 8
+    JRadioButtonMenuItem byReporting
+    JRadioButtonMenuItem byType
 
-    /**
-     * Calculate the minimum roow heights and widths based on the run type and table data
-     * @param widths
-     * @param height
-     * @param isCars
-     * @param tabData
-     * @param table
-     *       For cars - every row has at least height 2 and should be constant
-     *          column width is mox of roadname or roadnumber,
-     *          others - location or trackname
-     *          height is a minimum of 2, depending on number in inner cars
-     *          width is largest of (column 1 - location or trackName)
-     *          other columns - size of carid + size of load + 1
-     */
-    private void cellMaxes(ArrayList<Integer> widths,
-                           ArrayList<Integer> heights,
-                           boolean isCars,
-                           Vector<Vector<Object>> tabData,
-                           JTable table) {
-        tabData.eachWithIndex{ Vector<Vector<Object>> row, int i ->
-            row.eachWithIndex{ Object entry, int j ->
-                table.getCellRenderer(i, j).getCellMaxes(widths, heights, entry, j, i)
+    private ArrayList<ArrayList<Dimension>> calculateCellMax() {
+        log.debug("calculating max values for height of each cell ")
+        /**
+         * fill an array of arrays of Widths(width, height) for each cell
+         *      call the renderer with for each cell, get size of resulting JLabel
+         *      Fill an array for the row, one for each column
+         *      add that to array of rows
+         * Then, build an arroy of max widths (one for each column)
+         *      and build an array of maxHeights (on for each row)
+         */
+        ArrayList<ArrayList<Dimension>> theDimensions = new ArrayList<>()
+        ArrayList<Integer> columnMax = new ArrayList<>()
+        for (int col = 0; col < theTable.getColumnCount(); col++) {
+            columnMax.add(0)
+        }
+        for (int row = 0; row < theTable.getRowCount(); row++) {
+            log.debug("looking at row ${row}")
+            ArrayList<Dimension> rowArray = new ArrayList<>()
+            int rowMax = 0
+            for (int col; col < theTable.getColumnCount(); col++) {
+                log.debug("for column ${col}")
+                TableCellRenderer renderer = theTable.getCellRenderer(row, col)
+                Component comp = theTable.prepareRenderer(renderer, row, col)
+                comp.setSize(theTable.getColumnModel().getColumn(col).getWidth(), Integer.MAX_VALUE)
+                int thisHeight = comp.getPreferredSize().height
+                int thisWidth = comp.getPreferredSize().width
+                columnMax.set(col, Math.max(columnMax.get(col), thisWidth))
+                Dimension thisDim = new Dimension(thisWidth, thisHeight)
+                rowArray.add(thisDim)
+                rowMax = Math.max(rowMax, thisDim.height)
             }
+            theDimensions.add(rowArray)
+            theTable.setRowHeight(row, rowMax + 3)
+            log.debug("Row height for row ${row} set to ${rowMax+3}")
         }
+
+        for (int col = 0; col < columnMax.size(); col++) {
+            log.debug("col ${col} set to size ${columnMax.get(col)}")
+            TableColumn thisColumn = theTable.getColumnModel().getColumn(col)
+            thisColumn.setPreferredWidth(columnMax.get(col)+ 5)
+            thisColumn.setMinWidth(columnMax.get(col) + 3)
+        }
+        return theDimensions
     }
-
-    private void tableSizing(JTable tab) {
-        ArrayList<Integer> rowHeights = new ArrayList<>()
-        ArrayList<Integer> rowWidths = new ArrayList<>()
-        for (i in 0..<model.columnHeader.size()) {
-            rowWidths.add(Integer.valueOf(0))
-        }
-        for (i in 0..<model.dataForTable.size()) {
-            rowHeights.add(Integer.valueOf(0))
-        }
-        boolean isCar
-        if (model.modelParameter.runType.equals(ViewElement.RunType.CAR)){
-            isCar = true
-        } else if (model.modelParameter.runType.equals(ViewElement.RunType.TRACK)) {
-            isCar = false
-        } else {
-            log.error("modelParameter has unrecognized runType - ${model.modelParameter.runType}")
-        }
-        cellMaxes(rowWidths, rowHeights, isCar, model.dataForTable, tab)
-        TableColumnModel columnModel = tab.getColumnModel()
-   //     log.trace("column width multiplier is ${WIDTH_MULTIPLIER}")
-        for (i in 0..<model.columnHeader.size()) {
-       //     log.trace("column width for column ${i} is ${rowWidths.getAt(i)}")
-            columnModel.getColumn(i).setPreferredWidth((rowWidths.get(i)*WIDTH_MULTIPLIER))
-        }
-     //   log.trace("row height multiplier is ${HEIGHT_MULTIPLIER}")
-        for (i in 0..<model.dataForTable.size()) {
-     //       log.trace("row height for row ${i} is ${rowHeights.get(i)}")
-            tab.setRowHeight(i, (rowHeights.get(i) * HEIGHT_MULTIPLIER))
-        }
-        // put cell maxes here
-
-    }
-
 
     public void init() {
         thisDialog = new OpDialog(parent, "Car Movement Data", true)
@@ -102,15 +91,17 @@ class ViewTableView {
         thisDialog.setLayout(new BorderLayout())
         JMenuBar menuBar = new JMenuBar()
         ButtonGroup sortGroup = new ButtonGroup()
-        JRadioButtonMenuItem byReporting = new JRadioButtonMenuItem("By car number")
-        JRadioButtonMenuItem byType = new JRadioButtonMenuItem("By car type")
+        byReporting = new JRadioButtonMenuItem("By car number")
+        byType = new JRadioButtonMenuItem("By car type")
         JMenu sortMenu = new JMenu("Sort by")
         sortGroup.add(byReporting)
         sortGroup.add(byType)
         byType.setSelected(true)
         sortMenu.add(byReporting)
         sortMenu.add(byType)
-        menuBar.add(sortMenu)
+        if (model.modelParameter.runType == ViewElement.RunType.CAR) {
+            menuBar.add(sortMenu)
+        }
         JMenuItem fileClose = new JMenuItem("Close", KeyEvent.VK_C)
         menuBar.add(fileClose)
         fileClose.addActionListener(controller.closeAction)
@@ -120,8 +111,44 @@ class ViewTableView {
         theTable.setFillsViewportHeight(true)
         ViewCellRenderer renderer = new ViewCellRenderer()
         theTable.setDefaultRenderer(Object.class, renderer)
-        tableSizing(theTable)
+
         theTable.setIntercellSpacing(new Dimension(6, 3))
+        TableRowSorter sorter = new TableRowSorter<TableModel>(theTable.getModel())
+        if (model.modelParameter.runType == ViewElement.RunType.CAR) {
+            sorter.setSortable(0, true)
+        } else {
+            sorter.setSortable(0, false)
+        }
+        for (i in 1..<model.columnHeader.size()) {
+            sorter.setSortable(i, false)
+        }
+        sorter.setComparator(0, { Object left, Object right ->
+            log.debug("Comparing ${left} and ${right}")
+            if (!(left instanceof RowElement) | !(right instanceof RowElement)) {
+                log.error("trying to compare an incorrect type")
+                throw new RuntimeException("Comparing incorrect types in row sorter")
+                }
+            if (byType.isSelected()) {
+                if (left.carType < right.carType) {
+                    return -1
+                }
+                if (left.carType == right.carType) {
+                    return 0
+                }
+                return 1
+            } else {
+                if (left.carId < right.carType) {
+                    return -1
+                }
+                if (left.carId == right.carType) {
+                    return 0
+                }
+                return 1
+            }
+            return 0
+
+        })
+        theTable.setRowSorter(sorter)
         JScrollPane tableScroll = new JScrollPane(theTable)
         thisDialog.add(tableScroll, BorderLayout.CENTER)
         Toolkit toolkit = Toolkit.getDefaultToolkit()
@@ -149,6 +176,11 @@ class ViewTableView {
         thisDialog.setPreferredSize(new Dimension(dialogWidth, dialogHeight))
         thisDialog.setLocation(locx, locy)
         thisDialog.pack()
+        calculateCellMax()
+        for (int row = 0; row < theTable.getModel().getRowCount(); row++) {
+            log.debug("row ${row} has height ${theTable.getRowHeight(row)}")
+        }
+
         thisDialog.setVisible(true)
     }
 }

@@ -1,32 +1,30 @@
 package com.spw.view
 
+import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.JTable
+import javax.swing.table.DefaultTableCellRenderer
 import javax.swing.table.TableCellRenderer
 import java.awt.Component
 
-class ViewCellRenderer extends JList<String[]> implements TableCellRenderer {
+class ViewCellRenderer extends DefaultTableCellRenderer {
 
-    public getCellMaxes(ArrayList<Integer> widths, ArrayList<Integer> heights, Object value, int indWidth, int inHdeight) {
-        String[] testString = getCellStrings(value)
-        int maxHeight = heights.get(inHdeight)
-        maxHeight = testString.size() > maxHeight ? testString.size() : maxHeight
-        heights.set(inHdeight, maxHeight)
-        int maxWidth = widths.get(indWidth)
-        testString.each {
-            maxWidth = it.size() > maxWidth ? it.size() : maxWidth
-        }
-        widths.set(indWidth, maxWidth)
+    public String convertToHTML(String[] inStrings) {
+        //log.debu("converting the string[] ${inStrings} an HTML string")
+        StringBuffer sb = new StringBuffer("<html>")
+        sb.append(inStrings.join("<br>"))
+        sb.append("<html>")
+        return sb.toString()
     }
 
-    private String[] getCellStrings(Object value) {
+    private String getCellStrings(Object value) {
         String[] resultValue
         if (value instanceof RowElement) {
             resultValue = new String[2]
             if (ViewElement.thisRun.equals(ViewElement.RunType.CAR)) {
                 resultValue = new String[3]
                 resultValue[0] = value.roadName
-                resultValue[1] = value.roadNumber
+                resultValue[1] = "&emsp;" + value.roadNumber
                 resultValue[2] = value.carType
             } else {
                 resultValue = new String[2]
@@ -37,20 +35,20 @@ class ViewCellRenderer extends JList<String[]> implements TableCellRenderer {
             if (ViewElement.thisRun.equals(ViewElement.RunType.CAR)) {
                 resultValue = new String[2]
                 resultValue[0] = value.location
-                resultValue[1] = value.trackName + "-" + value.load
+                resultValue[1] = value.trackName + "&ensp;-&ensp;" + value.load
             } else {
                 resultValue = new String[2]
                 resultValue = new String[value.carList.size()]
                 int whichElement = 0
                 value.carList.each {
-                    resultValue[whichElement++] = it.carId + "-" + it.load
+                    resultValue[whichElement++] = it.roadName + "&thinsp;" + it.roadNumber+ "&ensp;-&ensp;" + it.load
                 }
             }
         } else {
             resultValue = new String[1]
             resultValue[0] = " "
         }
-        return resultValue
+        return convertToHTML(resultValue)
     }
 
     @Override
@@ -60,9 +58,7 @@ class ViewCellRenderer extends JList<String[]> implements TableCellRenderer {
                                             boolean hasFocus,
                                             int row,
                                             int column) {
-        String[] resultValue = getCellStrings(value)
-
-        setListData((String[]) resultValue)
-        return this
+        String resultValue = getCellStrings(value)
+        return new JLabel(resultValue)
     }
 }

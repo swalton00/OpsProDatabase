@@ -4,4 +4,6 @@ class InnerCar {
 
     String carId
     String load
+    String roadNumber
+    String roadName
 }

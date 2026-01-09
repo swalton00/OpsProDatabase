@@ -23,7 +23,7 @@ class ViewElement {
                 sb.append(location)
                 sb.append("\n")
             }
-            sb.append(trackName)
+            sb.append("&emsp;" + trackName)
             if (includeLoad) {
                 sb.append("-")
                 sb.append(load)

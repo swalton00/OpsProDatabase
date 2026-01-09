@@ -128,7 +128,9 @@
             l.name    AS locName,
             r.seq_Num AS sequence,
             r.load as load,
-            r.carid   AS carid
+            r.carid   AS carid,
+            c.ROADNAME as roadName,
+            c.ROADNUMBER as roadNumber
         FROM
             tracks AS T
         INNER JOIN
@@ -175,6 +177,8 @@
             <id property="sequenceNumber" column="sequence"/>
             <collection property="carList" ofType="InnerCar">
                 <id column="carid" property="carId"/>
+                <id column="roadName" property="roadName"/>
+                <id column="roadNumber" property="roadNumber"/>
                 <result column="load" property="load"/>
             </collection>
         </collection>
