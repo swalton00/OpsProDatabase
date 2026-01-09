@@ -37,12 +37,21 @@ class ViewCellRenderer extends DefaultTableCellRenderer {
                 resultValue[0] = value.location
                 resultValue[1] = value.trackName + "&ensp;-&ensp;" + value.load
             } else {
-                resultValue = new String[2]
-                resultValue = new String[value.carList.size()]
+                StringBuffer sb = new StringBuffer("<html><table><tbody>")
+                //resultValue = new String[value.carList.size()]
                 int whichElement = 0
                 value.carList.each {
-                    resultValue[whichElement++] = it.roadName + "&thinsp;" + it.roadNumber+ "&ensp;-&ensp;" + it.load
+                    //resultValue[whichElement++] = it.roadName + "&thinsp;" + it.roadNumber+ "&ensp;-&ensp;" + it.load
+                    sb.append("<tr><td>")
+                    sb.append(it.roadName)
+                    sb.append("</td><td>")
+                    sb.append(it.roadNumber)
+                    sb.append("</td><td>")
+                    sb.append(it.load)
+                    sb.append("</td>")
                 }
+                sb.append("</table></html")
+                return sb.toString()
             }
         } else {
             resultValue = new String[1]
