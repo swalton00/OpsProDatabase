@@ -387,6 +387,10 @@ class MainView implements DocumentListener, FocusListener{
                 break
             case "schema":
                 textChangeInner(e, mm.schema, theValue)
+                if (mm.schema.getValue().equalsIgnoreCase("OPS_DB")) {
+                    mm.message.setText("Schema 'Ops_Db' is reserved for the application", Message.Level.ERROR)
+                    mm.allFieldsValid = false
+                }
                 break
             case "runid":
                 textChangeInner(e, mm.runId, theValue)
