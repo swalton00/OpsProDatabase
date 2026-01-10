@@ -62,6 +62,7 @@
         <id property="id" column="id"/>
         <result property="carId" column="carId"/>
         <result property="carType" column="carType"/>
+        <result property="carTypeId" column="carTypeId"/>
         <result property="roadName" column="roadName"/>
         <result property="roadNumber" column="roadNumber"/>
         <collection property="elements" ofType="ViewElement">
@@ -80,6 +81,7 @@
             roadname,
             roadnumber,
             ct.CAR_TYPE as carType,
+            ct.id as carTypeId,
             r.id as rowId,
             r.seq_num as Seq,
             r.trkid as trkId,
@@ -113,6 +115,12 @@
         <if test="carSelect.name() == 'SPECIFIC'">
             AND
             <foreach collection="idList" item="item" separator=", " open="c.carid in ( " close=" )">
+                #{item}
+            </foreach>
+        </if>
+        <if test="carSelect.name() == 'CAR_TYPE'">
+            AND
+            <foreach collection="idList" item="item" separator=", " open="ct.id in ( " close=")">
                 #{item}
             </foreach>
         </if>
@@ -197,4 +205,11 @@
             AND r.carid = r1.carid
             AND NOT ( r1.trkid = r2.trkid ))
     </sql>
+    <select id="listViewTypes" parameterType="String" resultType="com.spw.view.ViewType">
+        SELECT id,
+            CAR_TYPE as carType
+        FROM CAR_TYPE
+        WHERE RUN_ID = #{runId}
+        ORDER BY CAR_TYPE
+    </select>
 </mapper>

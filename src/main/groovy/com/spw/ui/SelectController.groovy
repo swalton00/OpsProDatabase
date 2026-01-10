@@ -10,6 +10,7 @@ import com.spw.view.ViewLoc
 import com.spw.view.ViewParameter
 import com.spw.view.ViewTableController
 import com.spw.view.ViewTrack
+import com.spw.view.ViewType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -78,6 +79,7 @@ class SelectController {
         tableController.model.columnHeader = new Vector<>()
         List<Integer> seqs = vdb.getSequences(runId)
         List<RowElement> rowData
+        log.debug("selecting for view - runtype is ${parameters.runType}")
         if (parameters.runType.equals(ViewElement.RunType.CAR)) {
             ViewElement.setType(ViewElement.RunType.CAR, true, true)
             tableController.model.columnHeader.add("Car/Type")
@@ -131,8 +133,20 @@ class SelectController {
                     log.debug("no cars selected for specific view - set to ALL")
                     parameters.carSelect = ViewParameter.CarSelect.ALL
                 }
+            } else if (sm.rbType.isSelected()) {
+                log.debug("by car type was selected")
+                parameters.carSelect = ViewParameter.CarSelect.CAR_TYPE
+                parameters.idList = new ArrayList<>()
+                List<ViewType> selCars = sm.typeBox.getSelectedValuesList()
+                selCars.each {
+                    parameters.idList.add(it.id)
+                }
+                if (parameters.idList.size() == 0) {
+                    log.error("no types selected - set to all")
+                    parameters.carSelect = ViewParameter.CarSelect.ALL
+                }
             } else {
-                log.error("no selection amoung radio buttons for Cars")
+                log.error("no selection among radio buttons for Cars")
             }
         } else {
             parameters.runType = ViewElement.RunType.TRACK

@@ -5,6 +5,7 @@ import com.spw.view.ViewCar
 import com.spw.view.ViewElement
 import com.spw.view.ViewLoc
 import com.spw.view.ViewTrack
+import com.spw.view.ViewType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -30,10 +31,11 @@ class SelectModel {
 
     JRadioButton rbAllCars = new JRadioButton("All cars")
     JRadioButton rbMovedCars = new JRadioButton("Moved")
-    JRadioButton rbSpecific = new JRadioButton(("Specific cars"))
+    JRadioButton rbSpecific = new JRadioButton("Specific cars")
+    JRadioButton rbType = new JRadioButton("Specific Type")
     Vector<ViewCar> carList = new Vector<>()
     JList<ViewCar> carBox
-    List<Component> rbCarList = new ArrayList<>([rbAllCars, rbMovedCars, rbSpecific])
+    List<Component> rbCarList = new ArrayList<>([rbAllCars, rbMovedCars, rbSpecific, rbType])
 
     JRadioButton rbLocsAll = new JRadioButton("All Locations")
     JRadioButton rbLocsWith = new JRadioButton("Locations with Cars")
@@ -42,16 +44,14 @@ class SelectModel {
     Vector<ViewLoc> locList = new Vector()
     JList<ViewLoc> locBox
     JList<ViewTrack> trkBox
+    Vector<ViewType> typeList = new Vector()
+    JList<ViewType> typeBox
     DefaultListModel<ViewTrack> trkBoxModel
     List<Component> rbLocList = new ArrayList<>([rbLocsAll, rbLocsWith, rbLocsMoved, rbLocsSpecific])
 
     JButton buttonReturn = new JButton("Close Dialog")
     JButton buttonExport = new JButton("Export Data")
     JButton buttonView = new JButton("View Data")
-
-    // non-ui versions of the selection data
-
-
 
     void init() {
         log.debug("Select model has now been initialized")
@@ -60,6 +60,9 @@ class SelectModel {
         carBox = new JList<ViewCar>(carList)
         List<ViewLoc> retLocs = viewdb.listViewLocs(runId)
         locList.addAll(retLocs)
+        List<ViewType> carTypes = viewdb.listCarTypes(runId)
+        typeList.addAll(carTypes)
+        typeBox = new JList<ViewType>(typeList)
         locBox = new JList<ViewLoc>(locList)
         trkBoxModel = new DefaultListModel<>()
         trkBox = new JList<>(trkBoxModel)

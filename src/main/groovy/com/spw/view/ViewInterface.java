@@ -10,5 +10,5 @@ public interface ViewInterface {
     public List<Integer> getSequenceNumbers(String runId);
     public List<RowElement> listRows(ViewParameter parameter);
     public List<RowElement> listLocRows(ViewParameter parameter);
-
+    public List<ViewType> listViewTypes(String runId);
 }

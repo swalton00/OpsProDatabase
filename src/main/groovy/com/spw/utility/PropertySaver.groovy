@@ -82,14 +82,14 @@ class PropertySaver {
     }
 
     void saveInt(String prefix, String name, int value) {
-        log.debug("saving an integer for${prefix} - ${name}")
+        //log.debug("saving an integer for${prefix} - ${name}")
         checkLoaded()
         properties.put(prefix + "." + name, Integer.toString(value))
         dirty = true
     }
 
     Integer getInt(String prefix, String name) {
-        log.debug("getting an integer for ${prefix} - ${name}")
+        //log.debug("getting an integer for ${prefix} - ${name}")
         checkLoaded()
         String retVal
         retVal = properties.get(prefix + "." + name)

@@ -1,5 +1,6 @@
 package com.spw.view
 
+import com.spw.mappers.CarType
 import com.spw.rr.AbstractDatabase
 import com.spw.rr.DatabaseProcess
 import com.spw.view.ViewCar
@@ -99,6 +100,24 @@ class ViewDatabase {
             session = mainDB.getSession()
             ViewInterface map = session.getMapper(ViewInterface.class)
             List<RowElement> results = map.listLocRows(parameter)
+            log.debug("the resutts were ${results.size()}")
+            return results
+        } catch (Exception e) {
+            log.error("Exception processing a View ", e)
+        } finally {
+            if (session != null) {
+                session.close()
+            }
+        }
+        return null
+    }
+
+    public List<ViewType> listCarTypes(String runId) {
+        SqlSession session = null
+        try {
+            session = mainDB.getSession()
+            ViewInterface map = session.getMapper(ViewInterface.class)
+            List<ViewType> results = map.listViewTypes(runId)
             log.debug("the resutts were ${results.size()}")
             return results
         } catch (Exception e) {

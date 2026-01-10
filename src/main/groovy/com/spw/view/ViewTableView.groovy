@@ -56,11 +56,11 @@ class ViewTableView {
             columnMax.add(0)
         }
         for (int row = 0; row < theTable.getRowCount(); row++) {
-            log.debug("looking at row ${row}")
+            //log.debug("looking at row ${row}")
             ArrayList<Dimension> rowArray = new ArrayList<>()
             int rowMax = 0
             for (int col; col < theTable.getColumnCount(); col++) {
-                log.debug("for column ${col}")
+               // log.debug("for column ${col}")
                 TableCellRenderer renderer = theTable.getCellRenderer(row, col)
                 Component comp = theTable.prepareRenderer(renderer, row, col)
                 comp.setSize(theTable.getColumnModel().getColumn(col).getWidth(), Integer.MAX_VALUE)
@@ -73,11 +73,11 @@ class ViewTableView {
             }
             theDimensions.add(rowArray)
             theTable.setRowHeight(row, rowMax + 3)
-            log.debug("Row height for row ${row} set to ${rowMax+3}")
+          //  log.debug("Row height for row ${row} set to ${rowMax+3}")
         }
 
         for (int col = 0; col < columnMax.size(); col++) {
-            log.debug("col ${col} set to size ${columnMax.get(col)}")
+            //log.debug("col ${col} set to size ${columnMax.get(col)}")
             TableColumn thisColumn = theTable.getColumnModel().getColumn(col)
             thisColumn.setPreferredWidth(columnMax.get(col)+ 5)
             thisColumn.setMinWidth(columnMax.get(col) + 3)
