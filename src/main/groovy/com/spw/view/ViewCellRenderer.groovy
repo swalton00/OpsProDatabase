@@ -11,16 +11,15 @@ class ViewCellRenderer extends DefaultTableCellRenderer {
 
     public String convertToHTML(String[] inStrings) {
         //log.debu("converting the string[] ${inStrings} an HTML string")
-        StringBuffer sb = new StringBuffer("<html>")
+        StringBuffer sb = new StringBuffer("<html><nobr>")
         sb.append(inStrings.join("<br>"))
-        sb.append("<html>")
+        sb.append("</nobr></html>")
         return sb.toString()
     }
 
     private String getCellStrings(Object value) {
         String[] resultValue
         if (value instanceof RowElement) {
-            resultValue = new String[2]
             if (ViewElement.thisRun.equals(ViewElement.RunType.CAR)) {
                 resultValue = new String[3]
                 resultValue[0] = value.roadName
@@ -35,7 +34,7 @@ class ViewCellRenderer extends DefaultTableCellRenderer {
             if (ViewElement.thisRun.equals(ViewElement.RunType.CAR)) {
                 resultValue = new String[2]
                 resultValue[0] = value.location
-                resultValue[1] = value.trackName + "&ensp;-&ensp;" + value.load
+                resultValue[1] = value.trackName + "&nbsp;-&nbsp;" + value.load
             } else {
                 StringBuffer sb = new StringBuffer("<html><table><tbody>")
                 //resultValue = new String[value.carList.size()]
