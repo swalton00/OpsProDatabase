@@ -17,10 +17,24 @@ run the OpsCar program each tie you terminate a train in JMRI OpsPro.
 That would give you a way to track the movement of cars to ensure
 that the cars are moving the way you want them.
 
+When first run the program there are a number of fields 
+that you must fill out before you can actually collect data.
+Several of the fields (Userid, password and Schema) are items
+that you simply pick a value for, enter them, and then, 
+once the program uses them, they are fixed.
+One value (Operations Home) depends on where JMRI profile 
+operations director is located.
+Only the database information is complex and there are
+sam
+
 == Installation
 
 There is no installation process. Simply extract the files
 contained in the distribution zip to an empty folder.
+On Windows, this should *not* be in
+the Windows "Program Files" folder 
+(Windows makes this Read Only and the program 
+needs to write a log file to record what it has done.
 Change to the "bin" folder inside the resulting structure and
 execute either the "Ops_pro_car_progress.bat" or the
 "Ops_pro_car_progress" depending on your operating system
@@ -43,7 +57,10 @@ image::Annotated_Save_dialog.png[Dialog with pointers]
 ==== Userid
 
 The Userid field (labeled "A" in the image above) will become the userid
-for the database. If you won't be interacting with database except through
+for the database. 
+This first time you connect to the database, this will become
+the password, so it can be anything you want.
+If you won't be interacting with database except through
 this application, this field is not that important, but it must have a value.
 You can use any value you want, but it should start with a letter, consist
 of letters, numbers and perhaps an underscore. There is no specific length
@@ -68,7 +85,7 @@ Another required field (labeled "C"). It should start with a letter and
 contain only letters, numbers, and possibly underscores. This will
 be used to qualify the data in the database.
 
-==== Operations Homes
+==== Operations Home
 
 The location of the OpPro data. Either enter it in the field labeled "D",
 or use the the "Select Operations Home" button to find the correct

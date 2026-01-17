@@ -9,6 +9,7 @@ import net.miginfocom.swing.MigLayout
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import javax.imageio.ImageIO
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
@@ -17,7 +18,7 @@ import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import java.beans.PropertyChangeListener
 
-class MainView implements DocumentListener, FocusListener{
+class MainView implements DocumentListener, FocusListener {
     MainController mc
     MainModel mm
     JFrame mainFrame
@@ -25,7 +26,17 @@ class MainView implements DocumentListener, FocusListener{
 
     private static final Logger log = LoggerFactory.getLogger(MainView.class)
     private static final PropertySaver saver = PropertySaver.getInstance()
-
+    private static final String[] ICON_FILES = ["16x16/OpsProDB.png",
+                                                "16x16/OpsProDB2.png",
+                                                "16x16/OpsProDB3.png",
+                                                "32x32/OpsProDB.png",
+                                                "32x32/OpsProDB2.png",
+                                                "32x32/OpsProDB3.png",
+                                                "48x48/OpsProDB.png",
+                                                "48x48/OpsProDB2.png",
+                                                "48x48/OpsProDB3.png",
+                                                "256x256/OpsProDB.png",
+                                                "512x512/OpsProDB.png",]
 
     JTextField userid = new JTextField("", 8)
     JPasswordField pw = new JPasswordField("", 8)
@@ -95,12 +106,24 @@ class MainView implements DocumentListener, FocusListener{
         viewField.getDocument().addDocumentListener(this)
     }
 
+    private void doIcons(JFrame theFrame, String[] iconNames) {
+        ArrayList<Image> icons = new ArrayList<>()
+        iconNames.each {
+            InputStream inputStream = this.class.getClassLoader().getResourceAsStream(it)
+            Image iconImage = ImageIO.read(inputStream)
+            ImageIcon imageIcon = new ImageIcon(iconImage)
+            icons.add(imageIcon.getImage())
+        }
+        theFrame.setIconImages(icons)
+    }
+
     public void start() {
         mainFrame = new JFrame()
         mainFrame.addComponentListener(new FrameHelper())
         mainFrame.getContentPane().setLayout(new MigLayout("fillx"))
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
         mainFrame.setTitle("Ops Progress Main")
+        doIcons(mainFrame, ICON_FILES)
         Integer frameWidth = saver.getInt("main", OpDialog.getWidthName())
         if (frameWidth == null) {
             frameWidth = 250
@@ -257,19 +280,19 @@ class MainView implements DocumentListener, FocusListener{
         log.debug("entered the edt update routine - message was ${theMessage}")
         String oldMessage = mm.message.messageLabel.getText()
         log.debug("message old is ${oldMessage} and new message is ${theMessage.text}")
-       mm. message.messageLabel.setText(theMessage.text)
+        mm.message.messageLabel.setText(theMessage.text)
         switch (theMessage.msgLevel) {
             case Message.Level.ERROR:
-               mm. message.messageLabel.setBackground(Color.RED)
-               mm. message.messageLabel.setForeground(Color.WHITE)
+                mm.message.messageLabel.setBackground(Color.RED)
+                mm.message.messageLabel.setForeground(Color.WHITE)
                 break
             case Message.Level.WARNING:
-               mm. message.messageLabel.setBackground(Color.YELLOW)
-               mm. message.messageLabel.setForeground(Color.BLACK)
+                mm.message.messageLabel.setBackground(Color.YELLOW)
+                mm.message.messageLabel.setForeground(Color.BLACK)
                 break
             case Message.Level.INFO:
-               mm. message.messageLabel.setBackground(Color.WHITE)
-               mm. message.messageLabel.setForeground(Color.BLACK)
+                mm.message.messageLabel.setBackground(Color.WHITE)
+                mm.message.messageLabel.setForeground(Color.BLACK)
                 break
             default:
                 log.error("msgLevel was an unknown value ${theMessage.msgLevel}")
@@ -287,8 +310,7 @@ class MainView implements DocumentListener, FocusListener{
         }
     }
 
-    private void changeButton(JButton button, boolean newStatus)
-    {
+    private void changeButton(JButton button, boolean newStatus) {
         if (SwingUtilities.isEventDispatchThread()) {
             button.setEnabled(newStatus)
         } else {
@@ -303,7 +325,7 @@ class MainView implements DocumentListener, FocusListener{
         changeButton(buttonSave, enable)
     }
 
-    public void changeCollectButton(boolean enable)  {
+    public void changeCollectButton(boolean enable) {
         log.debug("changing Collect button enabled to ${enable}")
         changeButton(buttonCollect, enable)
     }
@@ -359,7 +381,6 @@ class MainView implements DocumentListener, FocusListener{
         }
 
     }
-
 
 
     private static void textChangeInner(DocumentEvent e, ObservableString field, String newValue) {
@@ -427,7 +448,7 @@ class MainView implements DocumentListener, FocusListener{
         log.trace("focus gained for ${comp}")
         if (comp instanceof JPasswordField) {
             previousValue = new String(comp.getPassword())
-        }  else {
+        } else {
             previousValue = comp.getText()
         }
         log.debug("previous value is ${previousValue}")
