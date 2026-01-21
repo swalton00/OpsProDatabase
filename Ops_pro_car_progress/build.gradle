@@ -3,6 +3,10 @@ plugins {
     id 'groovy'
 }
 
+plugins {
+    id 'application'
+}
+
 group = 'org.example'
 version = '1.1'
 
@@ -51,5 +55,6 @@ tasks.register("runCollect", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
-apply plugin: 'application'
-mainClassName = "com.spw.ui.OpsProgress"
+application {
+    mainClass.set("com.spw.ui.OpsProgress")
+}
