@@ -41,7 +41,7 @@ execute either the "Ops_pro_car_progress.bat" or the
 (.bat for Windows, the other for Unix or Mac).
 
 This program requires Java, at least at version 11, but supports up
-to 21. This is the same as the JMRI requirement.
+to Java 21. This is the same as the JMRI requirement.
 
 There are several values that must be entered the first time you
 run the program. When you run the program for the first time, you
@@ -87,18 +87,74 @@ be used to qualify the data in the database.
 
 ==== Operations Home
 
-The location of the OpPro data. Either enter it in the field labeled "D",
+The location of the OpsPro data. Either enter it in the field labeled "D",
 or use the the "Select Operations Home" button to find the correct
-location. This button will open a file chooser dialog which
-will allow you to select the "operations" directory of your
-JMRI installation. This directory will typically contain a
-number of files beginning with "Operations" and ending with ".xml" (you
-might not see the ending, depending on your operating system settings).
-This directory is in the location chosen
+location.
+
+An easy way to find this directory is to use JMRI to 
+show you the location. In PanelPro or DecoderPro, open the
+Help menu drop-down. 
+Choose the "File Locations" menu choice. This will
+open a panel like the following:
+
+image::File_Locations.png[File locations dialog]
+
+In this dialog, click on the "Open Profile Location" and you will see an Operating System window showing the contents of
+the JMRI Profile folder. One of the folders shown should be
+the "operations" diretory. This is the location you want.
+Double click on that folder. You should now be looking
+at the contents of that directory. Copy the address 
+of the location from the path at the top of the 
+explorer window. Paste that into the Operations Home field.
 
 
+If you use the "Select Operations Home" button, it will open
+a java File Browser. If your profile is located in a 
+custom location, you should navigate to that profile 
+directory and select the folder named "operations"
 
+Your home directory will contain a 
+directory which contains JMRI profiles (unless they are
+placed in a custom location). In Windows, this folder is
+named "JMRI", but in UNIX and Mac, it's called ".jmri" 
+which marks it as a "hidden" folder. Drill down into this
+folder and you should see the various JMRI profiles. 
+Choose the directory named for your operations profile.
+When you drill down into that folder, you should see
+the "operations" folder. This is the location you want. 
+Select that and click the Okay button. That will place 
+that directory name into the field.
 
+==== Database URL
 
+This is most difficult field, yet also the easiest, beacuase
+there several rules that determine the structure. There are
+several parts to the URL:
 
+. "jdbc:h2:" -- specifying the use of Java and H2 (the database).
+. "file:" -- the URL will contain the location of the database.
+. The location -- On Windows, this must be a fully qualified
+path  - thus it must start with a a drive letter.
+On Unix and Mac it can start with your home folder ("~").
+. "/" - a seperator
+. database -- the name of the database
+. ";" (optional, if nothing follows" -- a seperator
+. "AUTO_SERVER=TRUE:" -- (optional, but reccomended) specifies that another program can also use the database at the same time.
 
+On Windows, the location can use either a Windows style 
+path seperator ("\") or a Unix style ("/"), or both. 
+You can also use "~" as the Windows user home directory.
+
+===== Examples
+
+====== Windows
+
+* jdbc:h2:file:C:\Projects\decodder3/testing/testdb;;AUTO_SERVER=TRUE;
+
+* jdbc:h2:file:/C/Projects\decodder3/testing/testdb;;AUTO_SERVER=TRUE;
+
+* jdbc:h2:file:~\decodder3/testing/testdb;;AUTO_SERVER=TRUE;
+
+====== Unix
+
+* 
