@@ -39,6 +39,23 @@ task distribution {
     asciidoctorPdf
 }
 
+def buildDirPath = layout.buildDirectory.get().asFile
+
+// Define a task to copy images for PDF
+tasks.register('copyPdfImages', Copy) {
+    from 'src/docs/asciidoc/images' // Adjust this path to your source images directory
+    into file("${buildDirPath}/docs/asciidocPdf/images") // The output directory for PDF images
+}
+
+
+
+// Ensure the asciidoctorPdf task depends on the copy task
+tasks.named('asciidoctor') {
+    dependsOn 'copyPdfImages'
+    // Set the imagesdir attribute to the absolute path of the output directory
+    attributes 'imagesdir': file("${buildDirPath}/docs/asciidocPdf/images").absolutePath
+}
+
 asciidoctorPdf {
 
     baseDir "src/docs/asciidoc"
@@ -62,6 +79,11 @@ asciidoctorPdf {
 asciidoctor {
     //attributes stylesheet: 'src/docs/styles/special.css'
 
+    inProcess = JAVA_EXEC
+    forkOptions {
+        jvmArgs("--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED",
+                "--add-opens", "java.base/java.io=ALL-UNNAMED")
+    }
 
     outputOptions {
         backends = ['html5', 'pdf']

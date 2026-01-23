@@ -1,6 +1,7 @@
 = Ops Car Progress
 J. Scott Walton
 :description: documentation for the Ops Car program
+:imagesdir: ./images
 
 == Introduction
 
@@ -50,7 +51,9 @@ and saved before you can continue (unless you exit).
 
 image::Empty_dialog.png[Initial empty dialog]
 
-==== The fields in the Dialog
+== The Setup Dialog
+
+=== The fields in the Dialog
 
 image::Annotated_Save_dialog.png[Dialog with pointers]
 
