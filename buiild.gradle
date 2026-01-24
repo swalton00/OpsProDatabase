@@ -1,0 +1,20 @@
+plugins {
+    id 'distribution'
+}
+
+assemble.dependsOn asciidoctor
+
+tasks.named('distZip') {
+    dependsOn(":docs:asciidoctor")
+}
+
+distributions {
+    main {
+        contents {
+            from Ops_pro_car_progress.tasks.distZip
+            from file("${project(':docs').buildDir}/docs/asciidoc/pdf/")
+            into '/'
+            from 'src/main/dist'
+        }
+    }
+}

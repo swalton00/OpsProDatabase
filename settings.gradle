@@ -1,2 +1,2 @@
 rootProject.name = 'Ops_pro_car_progress'
-include 'Ops_pro_car_progress', 'doc'
+include 'Ops_pro', 'doc'

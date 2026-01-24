@@ -45,8 +45,9 @@ test {
 }
 
 tasks.withType(JavaCompile) {
-    options.release = 21 // Set your desired Java version here
+    options.release = 11 // Set your desired Java version here
 }
+
 
 tasks.register("runCollect", JavaExec) {
     group = "application"
@@ -57,4 +58,5 @@ tasks.register("runCollect", JavaExec) {
 
 application {
     mainClass.set("com.spw.ui.OpsProgress")
+    applicationName("OpsProCars")
 }
