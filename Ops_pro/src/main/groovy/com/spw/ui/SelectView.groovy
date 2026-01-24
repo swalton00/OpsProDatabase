@@ -154,7 +154,7 @@ class SelectView {
         sm.buttonReturn.addActionListener(sc.buttonReturnAction)
         sm.buttonExport.addActionListener(sc.buttonExportAction)
         sm.buttonView.addActionListener(sc.buttonViewAction)
-        viewDialog.add(sm.buttonExport, "center")
+        //viewDialog.add(sm.buttonExport, "center")
         viewDialog.add(sm.buttonView, "wrap")
 
         frameHeight = viewDialog.getHeight()
