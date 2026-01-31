@@ -247,11 +247,13 @@ class MainController {
     def buttonCollectAction = { ActionEvent event ->
         log.debug("collection requested")
         mv.buttonCollect.setEnabled(false)
+        mm.savedRunComment = mm.runComment.getValue()
         runit.runIt(collectTask)
     }
 
     Runnable collectTask = () -> {
         log.debug("first line of the collect task")
+        saver.writeValues()
         mm.message.setText("Collecting data")
         db.setRunId(mm.savedRunId, mm.savedRunComment)
         OpsReader ops = new OpsReader()

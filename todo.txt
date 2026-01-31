@@ -2,12 +2,6 @@ Bugs to fix
     1. compute width of columns and set preferred size of each
     2. compute max size of each row and set rowHeight of each
 
-State:
-    1. car type added, next
-    2. upgrade database code
-    3. add table to create sql
-    4. add carType to views by car
-
 Add
     1.. Move "Set OpsPro Home" up to save values
     2. Add a new setting - profiles
@@ -16,16 +10,16 @@ Add
         c. Add parameter "runId" to every SQL
             1) Reference runid as pre-execution parameter ("${}")
         d. New set of views to compare results between profile entries
-    3. Add car type to car (view by cars only)
-    4. New selection: View by car type
-    5. New selection: select (multiple selections) list by selected car type(s)
+   xxx 3. Add car type to car (view by cars only)
+ xxx   4. New selection: View by car type
+ xxx   5. New selection: select (multiple selections) list by selected car type(s)
     6. New selection: view by load
     7. New selection: select (multiple selections) list by load(s)
     8. Load status changed (for car views)
     9. Add a button to clear the data for a runId
     10. List of runid's with counts
-    10. New table with runid, runComment, and time of collection
-    11. New table DB_Version with major, minor and table count
+ xxx   10. New table with runid, runComment, and time of collection
+ xxx   11. New table DB_Version with major, minor and table count
     12. Move Ops_Home & Schema to database (out of properties)
         a. Reserve Schema "OPS_DB" for use by application
         b. New Table in schema OPS_DB.HOMES
@@ -35,3 +29,10 @@ Add
     14. Move display around
         a. Ops_home and Schema part of new dropdown list
             1) <NEW> or list existing
+    15. Allow multiple View windows
+        a. no singletons in View, Model or Controller
+        b. only dependency is on SelectView window
+        c. register window with SelectView
+    16. Add the Moved Count for cars
+        a. add to database
+        b. add to car display

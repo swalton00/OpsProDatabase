@@ -26,6 +26,8 @@ import java.awt.Component
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.KeyEvent
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 class ViewTableView {
 
@@ -39,6 +41,8 @@ class ViewTableView {
     JTable theTable
     JRadioButtonMenuItem byReporting
     JRadioButtonMenuItem byType
+    Pattern REGEX_PATTERN = Pattern.compile("^[\\d]*\$")
+
 
     private ArrayList<ArrayList<Dimension>> calculateCellMax() {
         log.debug("calculating max values for height of each cell ")
@@ -60,7 +64,7 @@ class ViewTableView {
             ArrayList<Dimension> rowArray = new ArrayList<>()
             int rowMax = 0
             for (int col; col < theTable.getColumnCount(); col++) {
-               // log.debug("for column ${col}")
+                // log.debug("for column ${col}")
                 TableCellRenderer renderer = theTable.getCellRenderer(row, col)
                 Component comp = theTable.prepareRenderer(renderer, row, col)
                 comp.setSize(theTable.getColumnModel().getColumn(col).getWidth(), Integer.MAX_VALUE)
@@ -73,13 +77,13 @@ class ViewTableView {
             }
             theDimensions.add(rowArray)
             theTable.setRowHeight(row, rowMax + 3)
-          //  log.debug("Row height for row ${row} set to ${rowMax+3}")
+            //  log.debug("Row height for row ${row} set to ${rowMax+3}")
         }
 
         for (int col = 0; col < columnMax.size(); col++) {
             //log.debug("col ${col} set to size ${columnMax.get(col)}")
             TableColumn thisColumn = theTable.getColumnModel().getColumn(col)
-            thisColumn.setPreferredWidth(columnMax.get(col)+ 5)
+            thisColumn.setPreferredWidth(columnMax.get(col) + 5)
             thisColumn.setMinWidth(columnMax.get(col) + 3)
         }
         return theDimensions
@@ -123,30 +127,56 @@ class ViewTableView {
             sorter.setSortable(i, false)
         }
         sorter.setComparator(0, { Object left, Object right ->
-            log.debug("Comparing ${left} and ${right}")
+            //log.debug("Comparing ${left} and ${right}")
             if (!(left instanceof RowElement) | !(right instanceof RowElement)) {
                 log.error("trying to compare an incorrect type")
                 throw new RuntimeException("Comparing incorrect types in row sorter")
-                }
+            }
             if (byType.isSelected()) {
                 if (left.carType < right.carType) {
                     return -1
                 }
-                if (left.carType == right.carType) {
-                    return 0
+                if (left.carType > right.carType) {
+                    return 1
                 }
-                return 1
-            } else {
-                if (left.carId < right.carType) {
-                    return -1
-                }
-                if (left.carId == right.carType) {
-                    return 0
-                }
+            }
+            log.debug("left is ${left.roadName} and ${left.roadNumber}")
+            log.debug("right is ${right.roadName} and ${right.roadNumber}")
+
+            if (left.roadName < right.roadName) {
+                log.debug("left is less - returning -1 ")
+                return -1
+            }
+            if (left.roadName > right.roadName) {
                 return 1
             }
+            log.debug("types are the same (if by type), and roadNames are the same")
+            boolean leftNumberGood = false
+            boolean rightNumberGood = false
+            Matcher leftMatch = REGEX_PATTERN.matcher(left.roadNumber)
+            leftNumberGood = leftMatch.matches()
+            Matcher rightMatch = REGEX_PATTERN.matcher(right.roadNumber)
+            rightNumberGood = rightMatch.matches()
+            if (leftNumberGood & rightNumberGood) {
+                log.debug("both are numeric - sorting numberically")
+                Integer leftNum = Integer.valueOf(left.roadNumber)
+                Integer rightNum = Integer.valueOf(right.roadNumber)
+                if (leftNum < rightNum) {
+                    return -1
+                }
+                if (leftNum > rightNum) {
+                    return 1
+                }
+                log.error("Road numbers show equal left = ${leftNum} and ${rightNum}")
+                return 0
+            }
+            log.info("non-numeric left ${leftNumberGood} or right ${rightNumberGood}")
+            if (rightNumberGood) {
+                return -1
+            } else {
+                return  1
+            }
             return 0
-
         })
         theTable.setRowSorter(sorter)
         JScrollPane tableScroll = new JScrollPane(theTable)
@@ -168,7 +198,7 @@ class ViewTableView {
             saver.saveInt("table", thisDialog.getHeightName(), dialogHeight)
         }
         if (locx == null) {
-            locx = (screenWidth - dialogWidth)/2
+            locx = (screenWidth - dialogWidth) / 2
             locy = (screenHeight - dialogHeight) / 2
             saver.saveInt("table", thisDialog.getXname(), locx)
             saver.saveInt("table", thisDialog.getYname(), locy)
@@ -177,10 +207,9 @@ class ViewTableView {
         thisDialog.setLocation(locx, locy)
         thisDialog.pack()
         calculateCellMax()
-        for (int row = 0; row < theTable.getModel().getRowCount(); row++) {
+/*        for (int row = 0; row < theTable.getModel().getRowCount(); row++) {
             log.debug("row ${row} has height ${theTable.getRowHeight(row)}")
-        }
-
+        }*/
         thisDialog.setVisible(true)
     }
 }

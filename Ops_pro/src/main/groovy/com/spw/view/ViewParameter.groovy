@@ -1,5 +1,8 @@
 package com.spw.view
 
+import groovy.transform.ToString
+
+@ToString(includePackage = false, includeFields = true, includeNames = true)
 class ViewParameter {
     ViewElement.RunType runType = ViewElement.RunType.CAR
     String runId

@@ -53,6 +53,8 @@ class SelectModel {
     JButton buttonExport = new JButton("Export Data")
     JButton buttonView = new JButton("View Data")
 
+    Integer moveCount = 0
+
     void init() {
         log.debug("Select model has now been initialized")
         List<ViewCar> retList  = viewdb.listCars(runId)

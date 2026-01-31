@@ -11,4 +11,5 @@ public interface ViewInterface {
     public List<RowElement> listRows(ViewParameter parameter);
     public List<RowElement> listLocRows(ViewParameter parameter);
     public List<ViewType> listViewTypes(String runId);
+    public Integer getMoveCount(String runId);
 }

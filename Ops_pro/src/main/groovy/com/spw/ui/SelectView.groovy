@@ -92,6 +92,10 @@ class SelectView {
         ButtonGroup carsGroup = new ButtonGroup()
         carsGroup.add(sm.rbAllCars)
         carsGroup.add(sm.rbMovedCars)
+        if (sm.moveCount < 1) {
+            log.trace("moveCount is low - setting moves to disabled")
+            sm.rbMovedCars.setEnabled(false)
+        }
         carsGroup.add(sm.rbSpecific)
         carsGroup.add(sm.rbType)
         JScrollPane carBoxPane = new JScrollPane(sm.carBox)
@@ -112,7 +116,6 @@ class SelectView {
 
 
         sm.rbAllCars.setSelected(true)
-
         Border carBorder = BorderFactory.createTitledBorder("Car options")
         carsPanel.setBorder(carBorder)
         viewDialog.add(carsPanel, "Wrap")
@@ -122,6 +125,7 @@ class SelectView {
         locGroup.add(sm.rbLocsAll)
         locGroup.add(sm.rbLocsWith)
         locGroup.add(sm.rbLocsMoved)
+
         locGroup.add(sm.rbLocsSpecific)
         locsPanel.add(sm.rbLocsAll, "wrap")
         sm.rbLocsAll.setSelected(true)

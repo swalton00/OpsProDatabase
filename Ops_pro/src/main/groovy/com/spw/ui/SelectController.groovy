@@ -55,9 +55,15 @@ class SelectController {
             }
             sm.rbCarList.each {
                 it.setEnabled(isCars)
+                if (sm.moveCount < 1) {
+                    sm.rbMovedCars.setEnabled(false)
+                }
             }
             sm.rbLocList.each {
                 it.setEnabled(!isCars)
+                if (sm.moveCount < 1) {
+                    sm.rbLocsMoved.setEnabled(false)
+                }
             }
         }
     }
@@ -213,6 +219,7 @@ class SelectController {
     public void init() {
         sm = new SelectModel(runId)
         sm.init()
+        sm.moveCount = vdb.getMoveCount(runId)
         sv = new SelectView(sm, this, parent)
         sv.init()
     }

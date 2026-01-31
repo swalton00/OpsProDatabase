@@ -192,18 +192,23 @@
         </collection>
     </resultMap>
     <sql id="carsMoved">
-        AND EXISTS
+        AND r.carid in
         (   SELECT
-            *
-        FROM
-            run_locs r1
-        INNER JOIN
-            run_locs r2
-        ON
-            r1.runid = r2.runid
-            AND r1.carid = r2.carid
-            AND r.carid = r1.carid
-            AND NOT ( r1.trkid = r2.trkid ))
+                r1.carid
+            FROM
+                run_locs r1
+            WHERE
+                runid = #{runId}
+            AND EXISTS
+            (   SELECT
+                     *
+                FROM
+                    run_locs r2
+                WHERE
+                    r1.runid = r2.runid
+                    AND r1.carid = r2.carid
+                    AND r1.trkid != r2.trkid)
+            )
     </sql>
     <select id="listViewTypes" parameterType="String" resultType="com.spw.view.ViewType">
         SELECT id,
@@ -211,5 +216,22 @@
         FROM CAR_TYPE
         WHERE RUN_ID = #{runId}
         ORDER BY CAR_TYPE
+    </select>
+    <select id="getMoveCount" parameterType="String" resultType="Integer">
+        SELECT
+            COUNT( DISTINCT carid)
+        FROM
+            run_locs r1
+        WHERE
+            runid = #{runId}
+          AND EXISTS
+            (   SELECT
+                    *
+                FROM
+                    run_locs r2
+                WHERE
+                    r1.runid = r2.runid
+                  AND r1.carid = r2.carid
+                  AND r1.trkid != r2.trkid)
     </select>
 </mapper>

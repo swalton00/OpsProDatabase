@@ -118,10 +118,28 @@ class ViewDatabase {
             session = mainDB.getSession()
             ViewInterface map = session.getMapper(ViewInterface.class)
             List<ViewType> results = map.listViewTypes(runId)
-            log.debug("the resutts were ${results.size()}")
+            log.debug("the results were ${results.size()}")
             return results
         } catch (Exception e) {
             log.error("Exception processing a View ", e)
+        } finally {
+            if (session != null) {
+                session.close()
+            }
+        }
+        return null
+    }
+
+    public Integer getMoveCount(String runId) {
+        SqlSession session = null
+        try {
+            session = mainDB.getSession()
+            ViewInterface map = session.getMapper(ViewInterface.class)
+            Integer moveCount = map.getMoveCount(runId)
+            log.debug("the resutts were ${moveCount}")
+            return moveCount
+        } catch (Exception e) {
+            log.error("Exception processing getMoveCount ", e)
         } finally {
             if (session != null) {
                 session.close()

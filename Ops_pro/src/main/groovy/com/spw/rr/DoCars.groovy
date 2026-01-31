@@ -50,6 +50,7 @@ class DoCars {
             thisCar.carLocId = carXml.cars.car[i].'@locationId'.text()
             thisCar.roadName = carXml.cars.car[i].'@roadName'.text()
             thisCar.carSecLocId = carXml.cars.car[i].'@secLocationId'.text()
+            thisCar.carDestLocId = carXml.cars.car[i].'@secDestinationId'.text()
             thisCar.carLoad = carXml.cars.car[i].'@load'.text()
             String tempType = carXml.cars.car[i].'@type'.text()
             log.debug("this car type is ${tempType}")
@@ -61,6 +62,13 @@ class DoCars {
                 thisCar.carTypeId = tempCt.id
                 log.debug("this car is now ${thisCar}")
             }
+            if (thisCar.carSecLocId.isEmpty() & !thisCar.carLocId.isEmpty()) {
+                log.debug("car ${thisCar.roadName} - ${thisCar.roadNumber} doesn't have a current full location - using destination")
+                if (!thisCar.carDestLocId.isEmpty()) {
+                    thisCar.carSecLocId = thisCar.carDestLocId
+                }
+            }
+
             if (thisCar.carLocId != null & !thisCar.carLocId.isEmpty()) {
                 carValues.put(thisCar.carId, thisCar)
                 log.debug("added car ${thisCar}")

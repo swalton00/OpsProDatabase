@@ -30,8 +30,8 @@ sam
 
 == Installation
 
-There is no installation process. Simply extract the files
-contained in the distribution zip to an empty folder.
+There is no automatic installation process. Simply extract the files
+contained in the distribution zip into an empty folder.
 On Windows, this should *not* be in
 the Windows "Program Files" folder 
 (Windows makes this Read Only and the program 
@@ -160,4 +160,155 @@ You can also use "~" as the Windows user home directory.
 
 ====== Unix
 
-* 
+* yet to come
+
+=== Completing the settings
+
+When all the values have been filled in, the Save button
+will be enabled. Click on that button. If there are
+are any problems with any of the values, you shold
+see a message telling you where the problem lies.
+If all the values are good, the Save button will be disabled
+and all the fields will be locked. If you really want
+to change values again, you will need to click on the
+"Enable reentry of settings" button and click "Okay" 
+that you really want to do that.
+
+=== The Run Identifier Field
+
+The Run Identifier label a set of values in the database. 
+This is "1" in the diagram above. Use this value
+to identify a series of Operations Pro movements you have 
+made in JMRI. This field needs to be non-blank, but it
+can be as simple as "A" or "B". Once this field is 
+non-blank, the "Collect" button will be enabled.
+
+The contents of the "Run Comment" field will be recorded
+each time you "Collect" data. Use that to identify what
+happened between collections.
+
+Once the Run Identifier has a value, the "Sequence" will
+show the number of times you have pressed the Collect
+button. If this number is greater than zero, the 
+"View" button will be enabled. 
+The sequence nuber will be the number columns you will
+see when you view the data.
+
+== Using the program
+
+Press the "Collect" button to read the first set of
+data from the OpsPro data. Then, in OpsPro, 
+build a train. Though it will work to "Move" the 
+train to the its first stop, I reccomend that you 
+"Terminate" the train. This basically moves it 
+through all of its stops. Now press the "Collect" 
+button again. You now have 2 sets of data collected and
+the "View" button will be enabled. When you click
+the View button you will see a dialog with
+many options allowing you to view car or by location.
+It will also give you many options to filter the 
+data.
+
+image::View_dialog.png[The options to view the data]
+
+If you select "By Car", you have several options to filter
+the view. Click on "View Data" to a table listing cars 
+(with their Road Name, Road Number and type of car) 
+listed down the left. Each column, labeled with the 
+sequence number (the order in which the data was collected), 
+contains the location, track and Load (type of load, or 
+empty).
+
+Notice that, if the "Moved" radio button is disabled it is
+because no cars moved between the various collections. 
+This might be because there was only one collection. 
+
+The View looks like the following:
+
+image::View_results.png[The data collected]
+
+You can sort the data by Car Number or Car Type by 
+clicking on the "Car/Type" header of the column. Which
+you sort by depends on the setting of the "Sort By" button,
+which can be "By Type" or "By Car". Clicking again reverses
+the sort order.
+
+Filter the data by selecting more specific options. 
+One of the most useful might be the "Moved" option:
+This shows only those cars that moved over the course of 
+the data collections. If you are devoloping your 
+OpsPro paramenters to move certain cars or loads, you
+might want to filter to show only that data.
+
+
+Selecting the "By Location" brings up a slightly 
+different view, showing the locations and which cars
+occupy them:
+
+image::View_Results_byLocation.png[View of data by location]
+
+This time, the Load/Empty is shown with the location. 
+Locations with no cars show an blank field. Some
+locations may have *many* cars.
+
+== Usage Scenarios
+
+=== Developing Custom Load Movements
+
+Suppose you are interested in getting LOads and Empties
+moving better by using custom loads at certain
+desitinations, but you aren't sure about the best
+way to do that. This program can help you investigate
+and compare the alternatives. Decide where you 
+will be using those custom loads, and which trains
+will be involved in moving those loads and empties.
+
+Start by making a complete backup of the OpsPro data. 
+When you do that, OpsPro will ask you to enter
+an identication for that backup, suggesting a time/date
+and letting you add something to it or change it.
+Use Operations Pro, Settings, Backup to do that. Now
+you have a starting point to which you can return
+after each set of trials. Make the to add custom 
+loads and empties at the appropriate points.
+
+Use the Run Identification to seperate the different
+trials. Each time you view the data, you will only see
+things happen within the data for that Run Identification.
+Thus you are starting from clean slate when you change 
+the Run Identification.
+
+Once you have changed the Run Identification, press the 
+Collect button and collect the first set of data. Next 
+Build and then Terminate the first train that you have
+determined will be involved. Now press the Collect button
+again. You now have the first set of data points. Continue
+with each train with the Build, Terminate and COllect process.
+Now you can see the effect of those changes you made to
+add the custom loads. You may find that the View of 
+"Moved" gets you quickly to see the effect of the loads and
+empties.
+
+To see the effect of a implementing the loads and empties
+differently you need to switch to a different Run Identification.
+Also, you need to restore the OpsPro data from the backup 
+you made earlier.
+OpsPro Settings Restore will show you list of backups you
+have made and let you select the one you want. 
+
+You now have reset OpsPro back to orginial conditions.
+Make your new changes to loads and empties and their 
+destinations and Collect the intial cars and locations.
+
+Run through the trains in the same manner you did earlier.
+Build, Terminate and Collect. Now you can see 
+how the cars have moved through the cycle.
+
+If you want to see how the earlier run went, you can
+change the Run Identification and View the data again.
+If you want to compare them, you can use screen shots.
+The programs doesn't (yet) provide a way the print the 
+data.
+
+
+

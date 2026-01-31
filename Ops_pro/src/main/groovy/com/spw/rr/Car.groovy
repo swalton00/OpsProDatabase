@@ -10,6 +10,7 @@ class Car {
     String carType
     String carLocId
     String carSecLocId
+    String carDestLocId
     String carLoad
     String runId
     int carTypeId
